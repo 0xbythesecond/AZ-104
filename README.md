@@ -1,8 +1,9 @@
-# AZ-104
-Notes to help me prepare for the Microsoft AZ-104
+<h1> AZ-104 </h1>
+
+###  Notes to help me prepare for the Microsoft AZ-104
 
 
-Connect
+**Connect** <br />
 When you're working with a local install of Azure PowerShell, you'll need to authenticate before you can execute Azure commands. The `Connect-AzAccount` cmdlet prompts for your Azure credentials, then connects to your Azure subscription. It has many optional parameters, but if all you need is an interactive prompt, you don't need any parameters:
 
 Use the `Get-AzContext` cmdlet to determine which subscription is active.
@@ -14,7 +15,7 @@ You can retrieve a list of all Resource Groups in the active subscription.
 To get a more concise view, you can send the output from the Get-AzResourceGroup to the Format-Table cmdlet using a pipe '|'.
 `Get-AzResourceGroup` | `Format-Table`
 
-You can create resource groups by using the New-AzResourceGroup cmdlet. You must specify a name and location. The name must be unique within your subscription. The location determines where the metadata for your resource group will be stored (which may be important to you for compliance reasons). 
+You can create resource groups by using the `New-AzResourceGroup` cmdlet. You must specify a name and location. The name must be unique within your subscription. The location determines where the metadata for your resource group will be stored (which may be important to you for compliance reasons). 
 
 New-AzResourceGroup -Name <name> -Location <location>
 
@@ -46,3 +47,108 @@ Here's an example that strings the Get-Credential cmdlet together with the `-Cre
   | `Stop-AzVM` | Stop a running VM |
   | `Restart-AzVM` | Restart a VM |
   | `Update-AzVM`	| Updates the configuration for a VM |
+  
+  You can list the VMs in your subscription using the Get-AzVM -Status command. This command also supports entering a specific VM by including the -Name property. Here, we'll assign it to a PowerShell variable:
+  ```powershell
+  $vm = Get-AzVM  -Name MyVM -ResourceGroupName ExerciseResources
+```
+
+The interesting thing is that now your VM is an object with which you can interact. For example, you can make changes to that object, then push changes back to Azure by using the Update-AzVM command:
+
+```powerShell
+$ResourceGroupName = "ExerciseResources"
+$vm = Get-AzVM  -Name MyVM -ResourceGroupName $ResourceGroupName
+$vm.HardwareProfile.vmSize = "Standard_DS3_v2"
+
+Update-AzVM -ResourceGroupName $ResourceGroupName  -VM $vm
+```
+The interactive mode in PowerShell is appropriate for one-off tasks. In our example, we'll likely use the same resource group for the lifetime of the project, so creating it interactively is reasonable. Interactive mode is often quicker and easier for this task than writing a script and executing that script exactly once.
+
+You can reach into complex objects through a dot (".") notation. For example, to see the properties in the VMSize object associated with the HardwareProfile section, run the following command:
+```powershell
+$vm.HardwareProfile
+
+VmSize          VmSizeProperties
+------          ----------------
+Standard_D2s_v3 
+```
+To get information on one of the disks, run the following command:
+```powershell
+$vm.StorageProfile.OsDisk
+
+OsType                  : Linux
+EncryptionSettings      : 
+Name                    : testvm-eus-01_disk1_3d16b00420464f0b9052cbc39e535925
+Vhd                     : 
+Image                   : 
+Caching                 : ReadWrite
+WriteAcceleratorEnabled : 
+DiffDiskSettings        : 
+CreateOption            : FromImage
+DiskSizeGB              : 30
+ManagedDisk             : Microsoft.Azure.Management.Compute.Models.ManagedDiskP
+                          arameters
+DeleteOption            : Detach
+```
+ to get your public IP address:
+ ```powershell
+ Get-AzPublicIpAddress -ResourceGroupName [resource group name] -Name "testvm-01"
+ ```
+ 
+ ### Delete a VM
+ To try out some more commands, let's delete the VM. We'll shut it down first:
+
+```powershell
+Stop-AzVM -Name $vm.Name -ResourceGroupName $vm.ResourceGroupName
+```
+Now, let's delete the VM by running the Remove-AzVM cmdlet:
+
+```powershell
+Remove-AzVM -Name $vm.Name -ResourceGroupName $vm.ResourceGroupName
+```
+
+Run this command to list all the resources in your resource group:
+```powershell
+Get-AzResource -ResourceGroupName $vm.ResourceGroupName | Format-Table
+```
+Delete the network interface:
+
+```PowerShell
+$vm | Remove-AzNetworkInterface –Force
+```
+Delete the managed OS disks and storage account:
+
+```PowerShell
+Get-AzDisk -ResourceGroupName $vm.ResourceGroupName -DiskName $vm.StorageProfile.OSDisk.Name | Remove-AzDisk -Force
+```
+Next, delete the virtual network:
+
+```PowerShell
+Get-AzVirtualNetwork -ResourceGroupName $vm.ResourceGroupName | Remove-AzVirtualNetwork -Force
+```
+Delete the network security group:
+
+```PowerShell
+Get-AzNetworkSecurityGroup -ResourceGroupName $vm.ResourceGroupName | Remove-AzNetworkSecurityGroup -Force
+```
+And finally, delete the public IP address:
+
+```PowerShell
+Get-AzPublicIpAddress -ResourceGroupName $vm.ResourceGroupName | Remove-AzPublicIpAddress -Force
+```
+### Variables
+In the last unit, you saw that PowerShell supports variables. Use $ to declare a variable and = to assign a value. For example:
+```powershell
+$loc = "East US"
+$iterations = 3
+```
+### Loops
+PowerShell has several loop structures, including For, Do...While, and For...Each. The For loop is the best match for our needs because we'll execute a cmdlet a fixed number of times.
+
+The following example shows the core syntax. The example runs for two iterations and prints the value of i each time. The comparison operators are written -lt for "less than", -le for "less than or equal", -eq for "equal", -ne for "not equal", etc.
+```powershell 
+For ($i = 1; $i -lt 3; $i++)
+{
+    $i
+}
+```

@@ -143,9 +143,9 @@ $loc = "East US"
 $iterations = 3
 ```
 ### Loops
-PowerShell has several loop structures, including For, Do...While, and For...Each. The For loop is the best match for our needs because we'll execute a cmdlet a fixed number of times.
+PowerShell has several loop structures, including `For`, `Do...While`, and `For...Each`. The For loop is the best match for our needs because we'll execute a cmdlet a fixed number of times.
 
-The following example shows the core syntax. The example runs for two iterations and prints the value of i each time. The comparison operators are written -lt for "less than", -le for "less than or equal", -eq for "equal", -ne for "not equal", etc.
+The following example shows the core syntax. The example runs for two iterations and prints the value of i each time. The comparison operators are written `-lt` for "less than", `-le` for "less than or equal", `-eq` for "equal", `-ne` for "not equal", etc.
 ```powershell 
 For ($i = 1; $i -lt 3; $i++)
 {

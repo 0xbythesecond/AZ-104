@@ -28,23 +28,21 @@ Azure PowerShell provides the `New-AzVm` cmdlet to create a virtual machine. The
 - Location: Geographic location where the VM will be provisioned.
 - Credential: An object containing the username and password for the VM admin account. We'll use the Get-Credential cmdlet. This cmdlet will prompt for a username and password and package it into a credential object.
 - Image: The operating system image to use for the VM, which is typically a Linux distribution or Windows Server.
-
 ```powershell
-  New-AzVm
+New-AzVm
        -ResourceGroupName <resource group name>
        -Name <machine name>
        -Credential <credentials object>
        -Location <location>
        -Image <image name>
-```
-You can supply these parameters directly to the cmdlet as shown in the previous example. Alternatively, you can use other cmdlets to configure the virtual machine, such as Set-AzVMOperatingSystem, Set-AzVMSourceImage, Add-AzVMNetworkInterface, and Set-AzVMOSDisk.
+  ```
+You can supply these parameters directly to the cmdlet as shown in the previous example. Alternatively, you can use other cmdlets to configure the virtual machine, such as `Set-AzVMOperatingSystem`, `Set-AzVMSourceImage`, `Add-AzVMNetworkInterface`, and `Set-AzVMOSDisk`.
 
-Here's an example that strings the Get-Credential cmdlet together with the -Credential parameter:
-
-    | Command | Description |
-    | --- | --- |
-    | Remove-AzVM | Deletes an Azure VM |
-    | Start-AzVM | 	Start a stopped VM |
-    | Stop-AzVM | Stop a running VM |
-    | Restart-AzVM | Restart a VM |
-    | Update-AzVM	| Updates the configuration for a VM |
+Here's an example that strings the Get-Credential cmdlet together with the `-Credential` parameter:
+  | Command | Description |
+  | --- | --- |
+  | `Remove-AzVM` | Deletes an Azure VM |
+  | `Start-AzVM` | 	Start a stopped VM |
+  | `Stop-AzVM` | Stop a running VM |
+  | `Restart-AzVM` | Restart a VM |
+  | `Update-AzVM`	| Updates the configuration for a VM |

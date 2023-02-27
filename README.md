@@ -401,5 +401,109 @@ Think about how you can implement administrative units in your organization. Her
 - Consider role requirements in the Azure portal. Plan your strategy for administrative units according to role privileges. In the Azure portal, only the Global Administrator or Privileged Role Administrator users can manage AUs.
 
 - Consider scope of administrative units. Recognize that the scope of an administrative unit applies only to management permissions. Members and admins of an administrative unit can exercise their default user permissions to browse other users, groups, or resources outside of their administrative unit.
+	
+What type of user account allows an external organization to access your resources?	
+- A guest user account for each member of the external team. 
+  -  A guest user account restricts users to just the access they need.
+	
+What kind of group account can you create so you can apply the same permissions to all group members?	
+- Security group
+  - You can create a security group for a specific security policy and apply the same permissions to all members of the group.
+	
+Which Azure AD role enables a user to manage all groups in your Teams tenants, and also assign other admin roles?
+- Global administrator
+  - The Global Administrator role manages all aspects of Azure AD and Microsoft services that use Azure AD identities. This role can manage groups across tenants and assign other administrator roles.
+
+# Identify Azure regions
+
+Microsoft Azure is made up of datacenters located around the globe. These datacenters are organized and made available to end users by region. A region is a geographical area on the planet containing at least one, but potentially multiple datacenters. The datacenters are in close proximity and networked together with a low-latency network. A few examples of regions are West US, Canada Central, West Europe, Australia East, and Japan West.
+
+### Things to know about regions
+Here are some points to consider about regions:
+
+- Azure is generally available in more than 60 regions in 140 countries.
+
+- Azure has more global regions than any other cloud provider.
+
+- Regions provide you with the flexibility and scale needed to bring applications closer to your users.
+
+- Regions preserve data residency and offer comprehensive compliance and resiliency options for customers.
+
+|Characteristic | Description |
+|---------------| ------------|
+|Physical isolation | Azure prefers at least 300 miles of separation between datacenters in a regional pair. This principle isn't practical or possible in all geographies. Physical datacenter separation reduces the likelihood of natural disasters, civil unrest, power outages, or physical network outages affecting both regions at once.
+|Platform-provided replication | Some services like Geo-Redundant Storage provide automatic replication to the paired region.
+|Region recovery order | During a broad outage, recovery of one region is prioritized out of every pair. Applications that are deployed across paired regions are guaranteed to have one of the regions recovered with priority.
+|Sequential updates | Planned Azure system updates are rolled out to paired regions sequentially (not at the same time). Rolling updates minimizes downtime, reduces bugs, and logical failures in the rare event of a bad update.
+|Data residency | Regions reside within the same geography as their enabled set (except for the Brazil South and Singapore regions).|
+
+### Things to consider when using regions and regional pairs
+
+- Consider resource and region deployment. Plan the regions where you want to deploy your resources. For most Azure services, when you deploy a resource in Azure, you choose the region where you want your resource to be deployed.
+
+- Consider service support by region. Research region and service availability. Some services or Azure Virtual Machines features are available only in certain regions, such as specific Virtual Machines sizes or storage types.
+
+- Consider services that don't require regions. Identify services that don't need region support. Some global Azure services that don't require you to select a region. These services include Azure Active Directory, Microsoft Azure Traffic Manager, and Azure DNS.
+
+- Consider exceptions to region pairing. Check the Azure website for current region availability and exceptions. If you plan to support the Brazil South region, note this region is paired with a region outside its geography. The Singapore region also has an exception to standard regional pairing.
+
+- Consider benefits of data residency. Take advantage of the benefits of data residency offered by regional pairs. This feature can help you meet requirements for tax and law enforcement jurisdiction purposes.
+
+### Things to know about subscriptions
+- As you think about the subscriptions to implement for your company, consider the following points:
+
+- Every Azure cloud service belongs to a subscription.
+
+- Each subscription can have a different billing and payment configuration.
+
+- Multiple subscriptions can be linked to the same Azure account.
+
+- More than one Azure account can be linked to the same subscription.
+
+- Billing for Azure services is done on a per-subscription basis.
+
+- If your Azure account is the only account associated with a subscription, you're responsible for the billing requirements.
+
+- Programmatic operations for a cloud service might require a subscription ID.
+
+### Things to consider when using subscriptions
+- Consider how many subscriptions your organization needs to support the business scenarios. As you plan, think about how you can organize your resources into resource groups.
+
+- Consider the types of Azure accounts required. Determine the types of Azure accounts your users will link with Azure subscriptions. You can use an Azure AD account or a directory that's trusted by Azure AD like a work or school account. If you don't belong to one of these organizations, you can sign up for an Azure account by using your Microsoft Account, which is also trusted by Azure AD.
+
+- Consider multiple subscriptions. Set up different subscriptions and payment options according to your company's departments, projects, regional offices, and so on. A user can have more than one subscription linked to their Azure account, where each subscription pertains to resources, access privileges, limits, and billing for a specific project.
+
+- Consider a dedicated shared services subscription. Plan for how users can share resources allocated in a single subscription. Use a shared services subscription to ensure all common network resources are billed together and isolated from other workloads. Examples of shared services subscriptions include Azure ExpressRoute and Virtual WAN.
+
+- Consider access to resources. Every Azure subscription can be associated with an Azure AD. Users and services authenticate with Azure AD before they access resources.
+
+Things to know about Microsoft Cost Management
+Your organization is interested in the benefits of using Microsoft Cost Management to monitor their subscription billing and resource usage. As you plan for your implementation, review the following product characteristics and features:
+
+Microsoft Cost Management shows organizational cost and usage patterns with advanced analytics. Costs are based on negotiated prices and factor in reservation and Azure Hybrid Benefit discounts. Predictive analytics are also available.
+
+Reports in Microsoft Cost Management show the usage-based costs consumed by Azure services and third-party Marketplace offerings. Collectively, the reports show your internal and external costs for usage and Azure Marketplace charges. The reports help you understand your spending and resource use, and can help find spending anomalies. Charges, such as reservation purchases, support, and taxes might not be visible in reports.
+
+The product uses Azure management groups, budgets, and recommendations to show clearly how your expenses are organized and how you might reduce costs.
+
+You can use the Azure portal or various APIs for export automation to integrate cost data with external systems and processes. Automated billing data export and scheduled reports are also available.
+
+Things to consider when using Microsoft Cost Management
+Microsoft Cost Management can help you plan for and control your organization costs. Consider how the product features can be implemented to support your business scenarios:
+
+Consider cost analysis. Take advantage of Microsoft Cost Management cost analysis features to explore and analyze your organizational costs. You can view aggregated costs by organization to understand where costs are accrued, and to identify spending trends. Monitor accumulated costs over time to estimate monthly, quarterly, or even yearly cost trends against a budget.
+
+Consider budget options. Use Microsoft Cost Management features to establish and maintain budgets. The product helps you plan for and meet financial accountability in your organization. Budgets help prevent cost thresholds or limits from being surpassed. You can utilize analysis data to inform others about their spending to proactively manage costs. The budget features help you see how company spending progresses over time.
+
+Consider recommendations. Review the Microsoft Cost Management recommendations to learn how you can optimize and improve efficiency by identifying idle and underutilized resources. Recommendations can reveal less expensive resource options. When you act on the recommendations, you change the way you use your resources to save money. Using recommendations is an easy process:
+
+View cost optimization recommendations to see potential usage inefficiencies.
+Act on a recommendation to modify your Azure resource use and implement a more cost-effective option.
+Verify the new action to make sure the change has the desired effect.
+Consider exporting cost management data. Microsoft Cost Management helps you work with your billing information. If you use external systems to access or review cost management data, you can easily export the data from Azure.
+
+Set a daily scheduled export in comma-separated-value (CSV) format and store the data files in Azure storage.
+Access your exported data from your external system.
+
 
 

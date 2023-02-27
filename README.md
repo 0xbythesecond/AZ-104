@@ -361,3 +361,45 @@ There are several points to consider about managing user accounts. As you review
 - **Consider using initial passwords.** Implement a convention for the initial password of a newly created user. Design a system to notify new users about their passwords in a secure way. You might generate a random password and email it to the new user or their manager.
 
 - **Consider strategies for minimizing errors.** View and address any errors, by downloading the results file on the Bulk operation results page in the Azure portal. The results file contains the reason for each error. An error might be a user account that's already been created or an account that's duplicated. Generally, it's easier to upload and troubleshoot smaller groups of user accounts.
+
+# Create group accounts
+
+Azure Active Directory (Azure AD) allows your organization to define two different types of group accounts. 
+- *Security groups* are used to manage member and computer access to shared resources for a group of users. You can create a security group for a specific security policy and apply the same permissions to all members of a group.
+- *Microsoft 365*  groups provide collaboration opportunities. Group members have access to a shared mailbox, calendar, files, SharePoint site, and more.
+
+  - Use security groups to set permissions for all group members at the same time, rather than adding permissions to each member individually.
+
+  - Add Microsoft 365 groups to enable group access for guest users outside your Azure AD organization.
+
+  - Security groups can be implemented only by an Azure AD administrator.
+  
+  - Normal users and Azure AD admins can both use Microsoft 365 groups.
+
+|Access rights | Description |
+|--------------| ------------|
+| Assigned | Add specific users as members of a group, where each user can have unique permissions.
+| Dynamic user | Use dynamic membership rules to automatically add and remove group members. When member attributes change, Azure reviews the dynamic group rules for the directory. If the member attributes meet the rule requirements, the member is added to the group. If the member attributes no longer meet the rule requirements, the member is removed.
+| Dynamic device | (Security groups only) Apply dynamic group rules to automatically add and remove devices in security groups. When device attributes change, Azure reviews the dynamic group rules for the directory. If the device attributes meet the rule requirements, the device is added to the security group. If the device attributes no longer meet the rule requirements, the device is removed.|
+
+### Things to think about administrative units
+Consider how a central admin role can use administrative units to support the Engineering department in our scenario:
+
+Create a role that has administrative permissions for only Azure AD users in the Engineering department administrative unit.
+
+Create an administrative unit for the Engineering department.
+
+Populate the administrative unit with only the Engineering department students, staff, and resources.
+
+Add the Engineering department IT team to the role, along with its scope.
+
+### Things to consider when working with administrative units
+Think about how you can implement administrative units in your organization. Here are some considerations:
+
+- Consider management tools. Review your options for managing AUs. You can use the Azure portal, PowerShell cmdlets and scripts, or Microsoft Graph.
+
+- Consider role requirements in the Azure portal. Plan your strategy for administrative units according to role privileges. In the Azure portal, only the Global Administrator or Privileged Role Administrator users can manage AUs.
+
+- Consider scope of administrative units. Recognize that the scope of an administrative unit applies only to management permissions. Members and admins of an administrative unit can exercise their default user permissions to browse other users, groups, or resources outside of their administrative unit.
+
+

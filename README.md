@@ -480,30 +480,75 @@ Here are some points to consider about regions:
 Things to know about Microsoft Cost Management
 Your organization is interested in the benefits of using Microsoft Cost Management to monitor their subscription billing and resource usage. As you plan for your implementation, review the following product characteristics and features:
 
-Microsoft Cost Management shows organizational cost and usage patterns with advanced analytics. Costs are based on negotiated prices and factor in reservation and Azure Hybrid Benefit discounts. Predictive analytics are also available.
+- Microsoft Cost Management shows organizational cost and usage patterns with advanced analytics. Costs are based on negotiated prices and factor in reservation and Azure Hybrid Benefit discounts. Predictive analytics are also available.
 
-Reports in Microsoft Cost Management show the usage-based costs consumed by Azure services and third-party Marketplace offerings. Collectively, the reports show your internal and external costs for usage and Azure Marketplace charges. The reports help you understand your spending and resource use, and can help find spending anomalies. Charges, such as reservation purchases, support, and taxes might not be visible in reports.
+- Reports in Microsoft Cost Management show the usage-based costs consumed by Azure services and third-party Marketplace offerings. Collectively, the reports show your internal and external costs for usage and Azure Marketplace charges. The reports help you understand your spending and resource use, and can help find spending anomalies. Charges, such as reservation purchases, support, and taxes might not be visible in reports.
 
-The product uses Azure management groups, budgets, and recommendations to show clearly how your expenses are organized and how you might reduce costs.
+- The product uses Azure management groups, budgets, and recommendations to show clearly how your expenses are organized and how you might reduce costs.
 
-You can use the Azure portal or various APIs for export automation to integrate cost data with external systems and processes. Automated billing data export and scheduled reports are also available.
+- You can use the Azure portal or various APIs for export automation to integrate cost data with external systems and processes. Automated billing data export and scheduled reports are also available.
 
-Things to consider when using Microsoft Cost Management
-Microsoft Cost Management can help you plan for and control your organization costs. Consider how the product features can be implemented to support your business scenarios:
+### Things to consider when using Microsoft Cost Management
+- Microsoft Cost Management can help you plan for and control your organization costs. Consider how the product features can be implemented to support your business scenarios:
 
-Consider cost analysis. Take advantage of Microsoft Cost Management cost analysis features to explore and analyze your organizational costs. You can view aggregated costs by organization to understand where costs are accrued, and to identify spending trends. Monitor accumulated costs over time to estimate monthly, quarterly, or even yearly cost trends against a budget.
+- Consider cost analysis. Take advantage of Microsoft Cost Management cost analysis features to explore and analyze your organizational costs. You can view aggregated costs by organization to understand where costs are accrued, and to identify spending trends. Monitor accumulated costs over time to estimate monthly, quarterly, or even yearly cost trends against a budget.
 
-Consider budget options. Use Microsoft Cost Management features to establish and maintain budgets. The product helps you plan for and meet financial accountability in your organization. Budgets help prevent cost thresholds or limits from being surpassed. You can utilize analysis data to inform others about their spending to proactively manage costs. The budget features help you see how company spending progresses over time.
+- Consider budget options. Use Microsoft Cost Management features to establish and maintain budgets. The product helps you plan for and meet financial accountability in your organization. Budgets help prevent cost thresholds or limits from being surpassed. You can utilize analysis data to inform others about their spending to proactively manage costs. The budget features help you see how company spending progresses over time.
 
-Consider recommendations. Review the Microsoft Cost Management recommendations to learn how you can optimize and improve efficiency by identifying idle and underutilized resources. Recommendations can reveal less expensive resource options. When you act on the recommendations, you change the way you use your resources to save money. Using recommendations is an easy process:
+  - Consider recommendations. Review the Microsoft Cost Management recommendations to learn how you can optimize and improve efficiency by identifying idle and underutilized resources. Recommendations can reveal less expensive resource options. When you act on the recommendations, you change the way you use your resources to save money. Using recommendations is an easy process:
 
-View cost optimization recommendations to see potential usage inefficiencies.
-Act on a recommendation to modify your Azure resource use and implement a more cost-effective option.
-Verify the new action to make sure the change has the desired effect.
-Consider exporting cost management data. Microsoft Cost Management helps you work with your billing information. If you use external systems to access or review cost management data, you can easily export the data from Azure.
+  1. View cost optimization recommendations to see potential usage inefficiencies.
+  2. Act on a recommendation to modify your Azure resource use and implement a more cost-effective option.
+  3. Verify the new action to make sure the change has the desired effect.
+- Consider exporting cost management data. Microsoft Cost Management helps you work with your billing information. If you use external systems to access or review cost management data, you can easily export the data from Azure.
 
-Set a daily scheduled export in comma-separated-value (CSV) format and store the data files in Azure storage.
-Access your exported data from your external system.
+  - Set a daily scheduled export in comma-separated-value (CSV) format and store the data files in Azure storage.
+  - Access your exported data from your external system.
 
 
+### Things to know about resource tags
+As you plan your Azure subscriptions, resources, and services, review these characteristics of Azure resource tags:
 
+- Each resource tag has a name and a value.
+
+- The tag name remains constant for all resources that have the tag applied.
+
+- The tag value can be selected from a defined set of values, or unique for a specific resource instance.
+
+- A resource or resource group can have a maximum of 50 tag name/value pairs.
+
+- Tags applied to a resource group aren't inherited by the resources in the resource group.
+
+### Things to consider when using resource tags
+Here are a few things you can do with resource tags:
+
+- Consider searching on tag data. Search for resources in your subscription by querying on the tag name and value.
+
+- Consider finding related resources. Retrieve related resources from other resource groups by searching on the tag name or value.
+
+- Consider grouping billing data. Group resources like virtual machines by cost center and production environment. When you download the resource usage comma-separated values (CSV) file for your services, the tags appear in the `Tags` column.
+
+- Consider creating tags with PowerShell or the Azure CLI. Create many resource tags programatically by using Azure PowerShell or the Azure CLI.
+	
+|Cost saving | Description|
+|------------| -----------|
+|Reservations| Save money by paying ahead. You can pay for one year or three years of virtual machine, SQL Database compute capacity, Azure Cosmos DB throughput, or other Azure resources. Pre-paying allows you to get a discount on the resources you use. Reservations can significantly reduce your virtual machine, SQL database compute, Azure Cosmos DB, or other resource costs up to 72% on pay-as-you-go prices. Reservations provide a billing discount and don't affect the runtime state of your resources.
+|Azure Hybrid Benefits | Access pricing benefits if you have a license that includes Software Assurance. Azure Hybrid Benefits helps maximize the value of existing on-premises Windows Server or SQL Server license investments when migrating to Azure. There's an Azure Hybrid Benefit Savings Calculator to help you determine your savings.
+|Azure Credits | Use the monthly credit benefit to develop, test, and experiment with new solutions on Azure. As a Visual Studio subscriber, you could use Microsoft Azure at no extra charge. With your monthly Azure credit, Azure is your personal sandbox for development and testing.
+|Azure regions | Compare pricing across regions. Pricing can vary from one region to another, even in the US. Double check the pricing in various regions to see if you can save by selecting a different region for your subscription.
+|Budgets | Apply the budgeting features in Microsoft Cost Management to help plan and drive organizational accountability. With budgets, you can account for the Azure services you consume or subscribe to during a specific period. Monitor spending over time and inform others about their spending to proactively manage costs. Use budgets to compare and track spending as you analyze costs.
+|Pricing Calculator | The [Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) provides estimates in all areas of Azure, including compute, networking, storage, web, and databases.|
+	
+The company financial controller wants to be notified whenever the company is half-way to spending the money allocated for cloud services. Which approach supports this request?
+	
+- Create a budget and a spending threshold.
+  - Create a budget and a spending threshold. Billing Alerts help your monitor and manage billing activity for your Azure accounts. Budget thresholds can be evaluated and are reset automatically at the end of a period.
+	
+The company financial controller wants to identify which billing department each Azure resource belongs to. Which approach enables this requirement?
+	
+- Apply a tag to each resource that includes the associated billing department. 
+  - Tags provide extra information, or metadata, about your resources. The team might create a tag named `BillingDept`, where the value is the name of the billing department. Azure Policy ensures that the proper tags are assigned when resources are provisioned.
+
+Which option preserves data residency, and offers comprehensive compliance and resiliency options? 
+	
+ - Regions preserve data residency, and offer comprehensive compliance and resiliency options for customers.

@@ -589,21 +589,152 @@ Azure Policy is a service in Azure that you can use to create, assign, and manag
 The main advantages of Azure Policy are in the areas of enforcement and compliance, scaling, and remediation. Azure Policy is also important for teams that run an environment that requires different forms of governance.
 
 |Advantage | Description|
-|--------| ------------------------|
+|--------| ------------------------------|
 |Enforce rules and compliance |	Enable built-in policies, or build custom policies for all resource types. Support real-time policy evaluation and enforcement, and periodic or on-demand compliance evaluation.
 |Apply policies at scale | Apply policies to a management group with control across your entire organization. Apply multiple policies and aggregate policy states with policy initiative. Define an exclusion scope.
 |Perform remediation | Conduct real-time remediation, and remediation on your existing resources.
-|Exercise governance | Implement governance tasks for your environment: Support multiple engineering teams (deploying to and operating in the environment)
-Manage multiple subscriptions Standardize and enforce how cloud resources are configured Manage regulatory compliance, cost control, security, and design consistency|
+|Exercise governance | Implement governance tasks for your environment: Support multiple engineering teams (deploying to and operating in the environment) Manage multiple subscriptions Standardize and enforce how cloud resources are configured Manage regulatory compliance, cost control, security, and design consistency|
 
 ### Things to consider when using Azure Policy
-Review the following scenarios for using Azure Policy. Consider how you can implement the service in your organization.
 
-Consider deployable resources. Specify the resource types that your organization can deploy by using Azure Policy. You can specify the set of virtual machine SKUs that your organization can deploy.
+- Consider deployable resources. Specify the resource types that your organization can deploy by using Azure Policy. You can specify the set of virtual machine SKUs that your organization can deploy.
 
-Consider location restrictions. Restrict the locations your users can specify when deploying resources. You can choose the geographic locations or regions that are available to your organization.
+- Consider location restrictions. Restrict the locations your users can specify when deploying resources. You can choose the geographic locations or regions that are available to your organization.
 
-Consider rules enforcement. Enforce compliance rules and configuration options to help manage your resources and user options. You can enforce a required tag on resources and define the allowed values.
+- Consider rules enforcement. Enforce compliance rules and configuration options to help manage your resources and user options. You can enforce a required tag on resources and define the allowed values.
 
-Consider inventory audits. Use Azure Policy with Azure Backup service on your VMs and run inventory audits.
+- Consider inventory audits. Use Azure Policy with Azure Backup service on your VMs and run inventory audits.
 
+# Access built-in policy definitions
+You can sort the [list of built-in definitions](https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-policies) by category to search for policies that meet your business needs.
+
+- Allowed virtual machine size SKUs: Specify a set of VM size SKUs that your organization can deploy. This policy is located under the Compute category.
+
+- Allowed locations: Restrict the locations users can specify when deploying resources. Use this policy to enforce your geo-compliance requirements. This policy is located under the General category.
+
+- Configure Azure Device Update for IoT Hub accounts to disable public network access: Disable public network access for your Device Update for IoT Hub resources. This policy is located under the Internet of Things category
+	
+# Use a built-in initiative definition
+You can create your own initiative definitions, or use built-in definitions in Azure Policy. You can sort the [list of built-in initiatives](https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-initiatives) by category to search for definitions for your organization.
+
+Here are some examples of built-in initiative definitions:
+
+Audit machines with insecure password security settings: Use this initiative to deploy an audit policy to specified resources in your organization. The definition evaluates the resources to check for insecure password security settings. This initiative is located under the Guest Configuration category.
+
+Configure Windows machines to run Azure Monitor Agent and associate them to a Data Collection Rule: Use this initiative to monitor and secure your Windows VMs, Virtual Machine Scale Sets, and Arc machines. The definition deploys the Azure Monitor Agent extension and associates the resources with a specified Data Collection Rule. This initiative is located under the Monitoring category.
+
+ISO 27001:2013: Use this initiative to apply policies for a subset of ISO 27001:2013 controls. This initiative is located under the Regulatory Compliance category.
+
+There are several Azure policies that need to be applied to a new branch office. What's the best approach? 
+	
+- Create a policy initiative
+  - A policy initiative is a set of policy definitions that could be applied to the new branch office.
+
+To satisfy the finance team's request for billing by department, multiple resource groups have been created and the resource tags applied. What's the next step? 
+	
+- Create an Azure policy 
+  -An Azure policy requires that a resource tag is applied before the resource is created.
+
+How can you ensure that only cost-effective virtual machine SKU sizes are deployed?
+
+ - Create a policy in Azure Policy that specifies the allowed SKU sizes
+  - There's a built-in Azure policy to specify the allowed virtual machine SKU sizes. After the policy is enabled, it's applied whenever a virtual machine is created or resized.
+
+ Which option can you use to manage governance across multiple Azure subscriptions?
+	
+- Management groups facilitate the hierarchical ordering of Azure resources into collections, at a level of scope above subscriptions. Distinct governance conditions can be applied to each management group, with Azure Policy and Azure role-based access controls, to manage Azure subscriptions effectively. The resources and subscriptions assigned to a management group automatically inherit the conditions applied to the management group.
+	
+# Implement role-based access control
+	
+### Things to know about Azure RBAC
+
+- Allow an application to access all resources in a resource group.
+
+- Allow one user to manage VMs in a subscription, and allow another user to manage virtual networks.
+
+- Allow a database administrator (DBA) group to manage SQL databases in a subscription.
+
+- Allow a user to manage all resources in a resource group, such as VMs, websites, and subnets.
+	
+| Concept | Description | Examples |
+|---------| -------------------|----------|
+Security principal | An object that represents something that requests access to resources. | User, group, service principal, managed identity
+Role definition | A set of permissions that lists the allowed operations. Azure RBAC comes with built-in role definitions, but you can also create your own custom role definitions. |	Some built-in role definitions: *Reader, Contributor, Owner, User Access Administrator*
+Scope |	The boundary for the requested *level* of access, or "how much" access is granted. | Root, management group, subscription, resource group, resource
+Assignment | An assignment attaches a role definition to a security principal at a particular scope. Users can grant the access described in a role definition by creating (attaching) an assignment for the role. | Assign the *User Access Administrator* role to an admin group scoped to a management group Assign the *Contributor* role to a user scoped to a subscription|
+
+### Things to consider when using Azure RBAC
+
+- Consider your requestors. Plan your strategy to accommodate for all types of access to your resources. Security principals are created for anything that requests access to your resources. Determine who are the requestors in your organization. Requestors can be internal or external users, groups of users, applications and services, resources, and so on.
+
+- Consider your roles. Examine the types of job responsibilities and work scenarios in your organization. Roles are commonly built around the requirements to fulfill job tasks or complete work goals. Certain users like administrators, corporate controllers, and engineers can require a level of access beyond what most users need. Some roles can be defined to provide the same access for all members of a team or department for specific resources or applications.
+
+- Consider scope of permissions. Think about how you can ensure security by controlling the scope of permissions for role assignments. Outline the types of permissions and levels of scope that you need to support. You can apply different scope levels for a single role to support requestors in different scenarios.
+
+- Consider built-in or custom definitions. Review the built-in role definitions in Azure RBAC. Built-in roles can be used as-is, or adjusted to meet the specific requirements for your organization. You can also create custom role definitions from scratch.
+	
+# Create a role definition
+	
+A role definition consists of sets of permissions that are defined in a JSON file. Each permission set has a name, such as Actions or NotActions that describes the purpose of the permissions. Some examples of permission sets include:
+
+- Actions permissions identify what actions are allowed.
+
+- NotActions permissions specify what actions aren't allowed.
+
+- DataActions permissions indicate how data can be changed or used.
+
+- AssignableScopes permissions list the scopes where a role definition can be assigned.
+
+The Actions permissions show the Contributor role has all action privileges. The asterisk `"*"` wildcard means "all." The NotActions permissions narrow the privileges provided by the Actions set, and deny three actions:
+
+- `Authorization/*/Delete`: Not authorized to delete or remove for "all."
+- `Authorization/*/Write`: Not authorized to write or change for "all."
+- `Authorization/elevateAccess/Action`: Not authorized to increase the level or scope of access privileges.
+	
+The Contributor role also has two DataActions permissions to specify how data can be affected:
+
+- `"NotDataActions": []`: No specific actions are listed. Therefore, all actions can affect the data.
+- `"AssignableScopes": ["/"]`: The role can be assigned for all scopes that affect data.
+	
+```powershell
+Name: Owner
+ID: 01010101-2323-4545-6767-987453021523
+IsCustom: False
+Description: Manage everything, including access to resources
+Actions: {*}             # All actions allowed
+NotActions: {}           # No actions denied
+AssignableScopes: {/}    # Role can be assigned to all scopes
+```
+Things to know about role definitions
+
+- Azure RBAC provides built-in roles and permissions sets. You can also create custom roles and permissions.
+
+- The Owner built-in role has the highest level of access privilege in Azure.
+
+- The system subtracts NotActions permissions from Actions permissions to determine the effective permissions for a role.
+
+- The AssignableScopes permissions for a role can be management groups, subscriptions, resource groups, or resources.
+
+### Role permissions
+
+Use the Actions and NotActions permissions together to grant and deny the exact privileges for each role. The Actions permissions can provide the breadth of access and the NotActions permissions can narrow the access.
+
+The following table shows how the Actions or NotActions permissions are used in the definitions for three built-in roles: Owner, Contributor, and Reader. The permissions are narrowed from the Owner role to the Contributor and Reader roles to limit access.
+
+|Role name | Description | Actions permissions| NotActions permissions|
+|----------|-------------|--------------------|-----------------------|	
+|*Owner*|	Allow all actions |	`*` |	n/a
+|*Contributor*| Allow all actions, except write or delete role assignment| `*`| `Microsoft.Authorization/*/Delete` `Microsoft.Authorization/*/Write` `Microsoft.Authorization/elevateAccess/Action`
+|*Reader*|Allow all read actions|	`/*/read`| n/a
+	
+### Things to consider when creating roles
+
+- Consider using built-in roles. Review the list of [built-in role definitions](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles) in Azure RBAC. There are over 100 pre-defined role definitions to choose from, such as Owner, Backup Operator, Website Contributor, and SQL Security Manager. Built-in roles are defined for several categories of services, tasks, and users, including General, Networking, Storage, Databases, and more.
+
+- Consider creating custom definitions. Define your own [custom roles](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles) to meet specific business scenarios for your organization. You can modify the permissions for a built-in role to meet the specific requirements for your organization. You can also create custom role definitions from scratch.
+
+ -Consider limiting access scope. Assign your roles with the minimum level of scope required to perform the job duties. Some users like administrators require full access to corporate resources to maintain the infrastructure. Other users in the organization can require write access to personal or team resource, and read-only access to shared company resources.
+
+- Consider controlling changes to data. Identify data or resources that should only be modified in specific scenarios and apply tight access control. Limit users to the least of amount of access they need to get their work done. A well-planned access management strategy helps to maintain your infrastructure and prevent security issues.
+
+- Consider applying deny assignments. Determine if you need to implement the deny assignment feature. Similar to a role assignment, a deny assignment attaches a set of deny actions to a user, group, or service principal at a particular scope for the purpose of denying access. Deny assignments block users from performing specific Azure resource actions even if a role assignment grants them access.

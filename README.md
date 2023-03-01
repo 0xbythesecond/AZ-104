@@ -829,3 +829,157 @@ Delete user accounts
 You can also delete user accounts through the Azure portal, Azure PowerShell, or the Azure CLI. In PowerShell, run the cmdlet Remove-AzADUser. In the Azure CLI, run the cmdlet az ad user delete.
 
 When you delete a user, the account remains in a suspended state for 30 days. During that 30-day window, the user account can be restored.
+
+### Why use SSPR?
+In Azure AD, any user can change their password if they're already signed in. But if they're not signed in and forgot their password or it's expired, they'll need to reset their password. With SSPR, users can reset their passwords in a web browser or from a Windows sign-in screen to regain access to Azure, Microsoft 365, and any other application that uses Azure AD for authentication.
+
+SSPR reduces the load on administrators, because users can fix password problems themselves, without having to call the help desk. Also, it minimizes the productivity impact of a forgotten or expired password. Users don't have to wait until an administrator is available to reset their password.
+
+### How SSPR works
+The user initiates a password reset either by going directly to the password reset portal or by selecting the Can't access your account link on a sign-in page. The reset portal takes these steps:
+
+ 1. Localization: The portal checks the browser's locale setting and renders the SSPR page in the appropriate language.
+ 2. Verification: The user enters their username and passes a captcha to ensure that it's a user and not a bot.
+ 3. Authentication: The user enters the required data to authenticate their identity. They might, for example, enter a code or answer security questions.
+ 4. Password reset: If the user passes the authentication tests, they can enter a new password and confirm it.
+ 5. Notification: A message is sent to the user to confirm the reset.
+	
+Authenticate a password reset
+It's critical to verify the identity of a user before you allow a password reset. Malicious users might exploit any weakness in the system to impersonate that user. Azure supports six different ways to authenticate reset requests.
+
+As an administrator, you choose the methods to use when you configure SSPR. Enable two or more of these methods so that users can choose the ones that they can use easily. The methods are:
+
+|`Authentication method`| `How to register`| `How to authenticate for a password reset`|
+|--------------------|-----------------|--------------------------|
+|Mobile app notification| Install the Microsoft Authenticator app on your mobile device, and then register it on the multifactor authentication setup page.| Azure sends a notification to the app, which you can either verify or deny.
+|Mobile app code| This method also uses the Authenticator app, and you install and register it in the same way.| Enter the code from the app.
+Email| Provide an email address that's external to Azure and Microsoft 365.|	Azure sends a code to the address, which you enter in the reset wizard.
+|Mobile phone| Provide a mobile phone number.|	Azure sends a code to the phone in an SMS message, which you enter in the reset wizard. Or, you can choose to get an automated call.
+|Office phone| Provide a nonmobile phone number.| You receive an automated call to this number and press #.
+|Security questions| Select questions such as "*In what city was your mother born?*" and save responses to them.| Answer the questions.|
+
+Require the minimum number of authentication methods
+You can specify the minimum number of methods that the user must set up: one or two. For example, you might enable the mobile app code, email, office phone, and security questions methods and specify a minimum of two methods. Then users can choose the two methods they prefer, like mobile app code and email.
+
+For the security question method, you can specify a minimum number of questions that the user must set up to register for this method. You also can specify a minimum number of questions that they must answer correctly to reset their password.
+
+After your users register the required information for the minimum number of methods you've specified, they're considered registered for SSPR.
+
+### Recommendations
+- Enable two or more of the authentication reset request methods.
+- Use the mobile app notification or code as the primary method, but also enable the email or office phone methods to support users without mobile devices.
+- The mobile phone method isn't a recommended method because it's possible to send fraudulent SMS messages.
+- The security question option is the least recommended method because the answers to the security questions might be known to other people. Only use the security question method in combination with at least one other method.
+### Accounts associated with administrator roles
+- A strong, two-method authentication policy is always applied to accounts with an administrator role, regardless of your configuration for other users.
+- The security questions method isn't available to accounts that are associated with an administrator role.
+	
+### Configure notifications
+Administrators can choose how users are notified of password changes. There are two options that you can enable:
+
+- Notify users on password resets: The user who resets their own password is notified to their primary and secondary email addresses. If the reset was done by a malicious user, this notification alerts the user, who can take mitigation steps.
+- Notify all admins when other admins reset their password: All administrators are notified when another administrator resets their password.
+
+### License requirements
+The editions of Azure AD are free, Premium P1, and Premium P2. The password reset functionality you can use depends on your edition.
+
+Any user who is signed in can change their password, regardless of the edition of Azure AD.
+
+If you're not signed in and you've forgotten your password or your password has expired, you can use SSPR in Azure AD Premium P1 or P2. It's also available with Microsoft 365 Apps for business or Microsoft 365.
+
+In a hybrid situation, where you have Active Directory on-premises and Azure AD in the cloud, any password change in the cloud must be written back to the on-premises directory. This writeback support is available in Azure AD Premium P1 or P2. It's also available with Microsoft 365 Apps for business. 
+
+When is a user considered registered for SSPR?
+	
+- When they've registered at least the number of methods that you've required to reset a password
+  - A user is considered registered for SSPR when they've registered at least the number of methods that you've required to reset a password. You can set this number in the Azure portal.
+
+ When you enable SSPR for your Azure AD organization...
+	
+- Users can reset their passwords when they can't sign in
+  - If the user passes the authentication tests, then they can reset their password.
+	
+# Implement Azure Storage
+
+Things to know about Azure Storage
+You can think of Azure Storage as supporting three categories of data: structured data, unstructured data, and virtual machine data. Review the following categories and think about which types of storage are used in your organization.
+
+Category| Description| Storage examples|
+|----------|---------------------------|---------------------------|
+Virtual machine data|	Virtual machine data storage includes disks and files. Disks are persistent block storage for Azure IaaS virtual machines. Files are fully managed file shares in the cloud.|	Storage for virtual machine data is provided through Azure managed disks. Data disks are used by virtual machines to store data like database files, website static content, or custom application code. The number of data disks you can add depends on the virtual machine size. Each data disk has a maximum capacity of 32,767 GB.
+Unstructured data|	Unstructured data is the least organized. It can be a mix of information that's stored together, but the data doesn't have a clear relationship. The format of unstructured data is referred to as non-relational.|	Unstructured data can be stored by using Azure Blob Storage and Azure Data Lake Storage. Blob Storage is a highly scalable, REST-based cloud object store. Azure Data Lake Storage is the Hadoop Distributed File System (HDFS) as a service.
+Structured data|	Structured data is stored in a relational format that has a shared schema. Structured data is often contained in a database table with rows, columns, and keys. Tables are an autoscaling NoSQL store.|	Structured data can be stored by using Azure Table Storage, Azure Cosmos DB, and Azure SQL Database. Azure Cosmos DB is a globally distributed database service. Azure SQL Database is a fully managed database-as-a-service built on SQL.|
+
+Things to consider when using Azure Storage
+- Consider durability and availability. Azure Storage is durable and highly available. Redundancy ensures your data is safe during transient hardware failures. You replicate data across datacenters or geographical regions for protection from local catastrophe or natural disaster. Data that's replicated remains highly available during an unexpected outage.
+
+- Consider secure access. All data written to Azure Storage is encrypted by the service. Azure Storage provides you with fine-grained control over who has access to your data.
+
+- Consider scalability. Azure Storage is designed to be massively scalable to meet the data storage and performance needs of modern applications.
+
+- Consider manageability. Microsoft Azure handles hardware maintenance, updates, and critical issues for you.
+
+- Consider data accessibility. Data in Azure Storage is accessible from anywhere in the world over HTTP or HTTPS. Microsoft provides SDKs for Azure Storage in various languages. You can use .NET, Java, Node.js, Python, PHP, Ruby, Go, and the REST API. Azure Storage supports scripting in Azure PowerShell or the Azure CLI. The Azure portal and Azure Storage Explorer offer easy visual solutions for working with your data.
+
+# Explore Azure Storage services
+
+Azure Storage offers four data services that can be accessed by using an Azure storage account:
+
+- Azure Blob Storage (containers): A massively scalable object store for text and binary data.
+
+- Azure Files: Managed file shares for cloud or on-premises deployments.
+
+- Azure Queue Storage: A messaging store for reliable messaging between application components.
+
+- Azure Table Storage: A NoSQL store for schemaless storage of structured data or relational data.
+	
+### Azure Blob Storage (containers)
+Azure Blob Storage is Microsoft's object storage solution for the cloud. Blob Storage is optimized for storing massive amounts of unstructured or non-relational data, such as text or binary data. Blob Storage is ideal for:
+
+- Serving images or documents directly to a browser.
+- Storing files for distributed access.
+- Streaming video and audio.
+- Storing data for backup and restore, disaster recovery, and archiving.
+- Storing data for analysis by an on-premises or Azure-hosted service.
+Objects in Blob Storage can be accessed from anywhere in the world via HTTP or HTTPS. Users or client applications can access blobs via URLs, the Azure Storage REST API, Azure PowerShell, the Azure CLI, or an Azure Storage client library. The storage client libraries are available for multiple languages, including .NET, Java, Node.js, Python, PHP, and Ruby.
+	
+### Azure Files
+Azure Files enables you to set up highly available network file shares. Shares can be accessed by using the Server Message Block (SMB) protocol and the Network File System (NFS) protocol. Multiple virtual machines can share the same files with both read and write access. You can also read the files by using the REST interface or the storage client libraries.
+
+File shares can be used for many common scenarios:
+
+- Many on-premises applications use file shares. This feature makes it easier to migrate those applications that share data to Azure. If you mount the file share to the same drive letter that the on-premises application uses, the part of your application that accesses the file share should work with minimal, if any, changes.
+- Configuration files can be stored on a file share and accessed from multiple virtual machines. Tools and utilities used by multiple developers in a group can be stored on a file share, ensuring that everybody can find them, and that they use the same version.
+- Diagnostic logs, metrics, and crash dumps are just three examples of data that can be written to a file share and processed or analyzed later.
+The storage account credentials are used to provide authentication for access to the file share. All users who have the share mounted should have full read/write access to the share.
+
+### Azure Queue Storage
+Azure Queue Storage is used to store and retrieve messages. Queue messages can be up to 64 KB in size, and a queue can contain millions of messages. Queues are used to store lists of messages to be processed asynchronously.
+
+Consider a scenario where you want your customers to be able to upload pictures, and you want to create thumbnails for each picture. You could have your customer wait for you to create the thumbnails while uploading the pictures. An alternative is to use a queue. When the customer finishes the upload, you can write a message to the queue. Then you can use an Azure Function to retrieve the message from the queue and create the thumbnails. Each of the processing parts can be scaled separately, which gives you more control when tuning the configuration.
+
+### Azure Table Storage (Azure Cosmos DB)
+Azure Table Storage is now part of Azure Cosmos DB, which is a fully managed NoSQL database service for modern app development. As a fully managed service, Azure Cosmos DB takes database administration off your hands with automatic management, updates, and patching. It also handles capacity management with cost-effective serverless and automatic scaling options that respond to application needs to match capacity with demand.
+
+In addition to the existing Azure Table Storage service, there's a new Azure Cosmos DB Table API offering that provides throughput-optimized tables, global distribution, and automatic secondary indexes.
+	
+Things to consider when choosing Azure Storage services
+As you think about your configuration plan for Azure Storage, consider the prominent features of the types of Azure Storage and which options support your application needs.
+
+- Consider storage optimization for massive data. Azure Blob Storage is optimized for storing massive amounts of unstructured data. Objects in Blob Storage can be accessed from anywhere in the world via HTTP or HTTPS. Blob Storage is ideal for serving data directly to a browser, streaming data, and storing data for backup and restore.
+
+- Consider storage with high availability. Azure Files supports highly available network file shares. On-premises apps use file shares for easy migration. By using Azure Files, all users can access shared data and tools. Storage account credentials provide file share authentication to ensure all users who have the file share mounted have the correct read/write access.
+
+- Consider storage for messages. Use Azure Queue Storage to store large numbers of messages. Queue Storage is commonly used to create a backlog of work to process asynchronously.
+
+- Consider storage for structured data. Azure Table Storage is ideal for storing structured, non-relational data. It provides throughput-optimized tables, global distribution, and automatic secondary indexes. Because Azure Table Storage is part of Azure Cosmos DB, you have access to a fully managed NoSQL database service for modern app development.
+
+# Determine storage account types
+
+
+|Storage account| Supported services| Recommended usage|
+|---------------|-----------------------|------------------------|	
+[Standard general-purpose v2](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-upgrade)|	Blob Storage (including Data Lake Storage), Queue Storage, Table Storage, and Azure Files|	Standard storage account for most scenarios, including blobs, file shares, queues, tables, and disks (page blobs).
+|[Premium block blobs](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-block-blob-premium)| Blob Storage (including Data Lake Storage)| Premium storage account for block blobs and append blobs. Recommended for applications with high transaction rates. Use Premium block blobs if you work with smaller objects or require consistently low storage latency. This storage is designed to scale with your applications.
+[Premium file shares](https://learn.microsoft.com/en-us/azure/storage/files/storage-how-to-create-file-share)| Azure Files| Premium storage account for file shares only. Recommended for enterprise or high-performance scale applications. Use Premium file shares if you require support for both Server Message Block (SMB) and NFS file shares.
+|[Premium page blobs](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-pageblob-overview)| Page blobs only| Premium high-performance storage account for page blobs only. Page blobs are ideal for storing index-based and sparse data structures, such as operating systems, data disks for virtual machines, and databases.|

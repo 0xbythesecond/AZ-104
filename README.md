@@ -738,3 +738,94 @@ The following table shows how the Actions or NotActions permissions are used in 
 - Consider controlling changes to data. Identify data or resources that should only be modified in specific scenarios and apply tight access control. Limit users to the least of amount of access they need to get their work done. A well-planned access management strategy helps to maintain your infrastructure and prevent security issues.
 
 - Consider applying deny assignments. Determine if you need to implement the deny assignment feature. Similar to a role assignment, a deny assignment attaches a set of deny actions to a user, group, or service principal at a particular scope for the purpose of denying access. Deny assignments block users from performing specific Azure resource actions even if a role assignment grants them access.
+	
+|                | Azure RBAC roles| Azure AD admin roles|
+|----------------|------------------|---------------------|
+|Access management| Manages access to Azure resources| Manages access to Azure AD resources
+Scope assignment| Scope can be specified at multiple levels, including management groups, subscriptions, resource groups, and resources| Scope is specified at the tenant level
+Role definitions| Roles can be defined via the Azure portal, the Azure CLI, Azure PowerShell, Azure Resource Manager templates, and the REST API| Roles can be defined via the Azure admin portal, Microsoft 365 admin portal, and Microsoft Graph Azure AD PowerShell
+
+# Apply role-based access control
+
+Built-in role definitions in Azure RBAC are defined for several categories of services, tasks, and users. You can assign built-in roles at different scopes to support various scenarios, and build custom roles from the base definitions.
+
+Azure Active Directory (Azure AD) also provides built-in roles to manage resources in Azure AD, including users, groups, and domains. Azure AD offers [administrator roles](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference) that you can implement for your organization, such as Global admin, Application admin, and Application developer.
+	
+- **Azure AD admin roles** are used to manage resources in Azure AD, such as users, groups, and domains. These roles are defined for the Azure AD tenant at the root level of the configuration.
+
+- **Azure RBAC roles** provide more granular access management for Azure resources. These roles are defined for a requestor or resource and can be applied at multiple levels: the root, management groups, subscriptions, resource groups, or resources.
+	
+You have three virtual machines (VM1, VM2, VM3) in a resource group. A new admin is hired, and they need to be able to modify settings on VM3. They shouldn't be able to make changes to VM1 or VM2. How can you implement RBAC to minimize administrative overhead?
+
+- Assign the admin to the Contributor role on VM3. 
+  - When you assign the Contributor role to the specific resource, the admin can change the settings on that resource; in this case, VM3.
+	
+Explain the main differences between Azure roles and Azure Active Directory (Azure AD) roles.
+
+- Azure roles apply to Azure resources. Azure AD roles apply to Azure AD resources such as users, groups, and domains.
+  - Azure roles are used to manage access to VMs, storage, and other Azure resources. Azure AD roles are used to manage access to Azure AD resources like user accounts and passwords.
+	
+What's included in a custom Azure role definition?
+
+- Operations allowed for Azure resources, and scope of permissions
+  - A custom role definition includes the allowed operations, such as read, write, and delete for Azure resources. The custom role definition also includes the scope of these permissions.
+	
+### Administrator roles
+Administrator roles in Azure AD allow users elevated access to control who is allowed to do what. You assign these roles to a limited group of users to manage identity tasks in an Azure AD organization. You can assign administrator roles that allow a user to create or edit users, assign administrative roles to others, reset user passwords, manage user licenses, and more.
+
+If your user account has the User Administrator or Global Administrator role, you can create a new user in Azure AD by using either the Azure portal, the Azure CLI, or PowerShell. In PowerShell, run the cmdlet New-AzureADUser. In the Azure CLI, use az ad user create.
+
+### Member users
+A member user account is a native member of the Azure AD organization that has a set of default permissions like being able to manage their profile information. When someone new joins your organization, they typically have this type of account created for them.
+
+Anyone who isn't a guest user or isn't assigned an administrator role falls into this type. A member user is meant for users who are considered internal to an organization and are members of the Azure AD organization. However, these users shouldn't be able to manage other users by, for example, creating and deleting users. Member users don't have the same restrictions that are typically placed on guest users.
+
+### Guest users
+Guest users have restricted Azure AD organization permissions. When you invite someone to collaborate with your organization, you add them to your Azure AD organization as a guest user. Then you can either send an invitation email that contains a redemption link or send a direct link to an app you want to share. Guest users sign in with their own work, school, or social identities. By default, Azure AD member users can invite guest users. This default can be disabled by someone who has the User Administrator role.
+
+Your organization might need to work with an external partner. To collaborate with your organization, these partners often need to have a certain level of access to specific resources. For this sort of situation, it's a good idea to use guest user accounts. You'll then make sure partners have the right level of access to do their work, without having a higher level of access than they need.
+
+Add user accounts
+You can add individual user accounts through the Azure portal, Azure PowerShell, or the Azure CLI.
+
+If you want to use the Azure CLI, run the following cmdlet:
+
+Azure CLI
+
+```
+# create a new user
+az ad user create
+```	
+This command creates a new user by using the Azure CLI.
+
+For Azure PowerShell, run the following cmdlet:
+
+```PowerShell
+# create a new user
+New-AzureADUser
+````
+You can bulk create member users and guests accounts. The following example shows how to bulk invite guest users.
+
+```PowerShell
+$invitations = import-csv c:\bulkinvite\invitations.csv
+
+$messageInfo = New-Object Microsoft.Open.MSGraph.Model.InvitedUserMessageInfo
+
+$messageInfo.customizedMessageBody = "Hello. You are invited to the Contoso organization."
+
+foreach ($email in $invitations)
+   {New-AzureADMSInvitation `
+      -InvitedUserEmailAddress $email.InvitedUserEmailAddress `
+      -InvitedUserDisplayName $email.Name `
+      -InviteRedirectUrl https://myapps.microsoft.com `
+      -InvitedUserMessageInfo $messageInfo `
+      -SendInvitationMessage $true
+   }
+```
+	
+You create the comma-separated values (CSV) file with the list of all the users you want to add. An invitation is sent to each user in that CSV file.
+
+Delete user accounts
+You can also delete user accounts through the Azure portal, Azure PowerShell, or the Azure CLI. In PowerShell, run the cmdlet Remove-AzADUser. In the Azure CLI, run the cmdlet az ad user delete.
+
+When you delete a user, the account remains in a suspended state for 30 days. During that 30-day window, the user account can be restored.

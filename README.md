@@ -1087,3 +1087,43 @@ The following example shows how a domain in use is mapped to an Azure storage ac
 It can be difficult to determine exactly when to use Azure Files to store data as file shares rather than Azure Blob Storage or Azure Disks to store data as blobs. The following table compares different features of these services and common implementation scenarios.
 
 
+|Azure Files (file shares)| Azure Blob Storage (blobs)|	Azure Disks (page blobs)|
+|-------------------------|---------------------------|-------------------------|	
+|Azure Files provides the SMB and NFS protocols, client libraries, and a REST interface that allows access from anywhere to stored files.|	Azure Blob Storage provides client libraries and a REST interface that allows unstructured data to be stored and accessed at a massive scale in block blobs.|	Azure Disks is similar to Azure Blob Storage. Azure Disks provides a REST interface to store and access index-based or structured data in page blobs.
+|_**Azure Files**_ is ideal to lift and shift an application to the cloud that already uses the native file system APIs. Share data between the app and other applications running in Azure.
+_**Azure Files**_ is a good option when you want to store development and debugging tools that need to be accessed from many virtual machines.| _**Azure Blob Storage**_ is ideal for applications that need to support streaming and random-access scenarios. _**Azure Blob Storage**_ is a good option when you want to be able to access application data from anywhere.| _**Azure Disks**_ solutions are ideal when your applications run frequent random read/write operations. *Azure Disks* is a good option when you want to store relational data for operating system and data disks in Azure Virtual Machines and databases.|
+	
+### Things to consider when using Azure File Sync
+There are many advantages to using Azure File Sync. Consider the following scenarios, and think about how you can use Azure File Sync with your Azure Files shares.
+
+- Consider application lift and shift. Use Azure File Sync to move applications that require access between Azure and on-premises systems. Provide write access to the same data across Windows Servers and Azure Files.
+
+- Consider support for branch offices. Support your branch offices that need to back up files by using Azure File Sync. Use the service to set up a new server that connects to Azure storage.
+
+- Consider backup and disaster recovery. After you implement Azure File Sync, Azure Backup backs up your on-premises data. Restore file metadata immediately and recall data as needed for rapid disaster recovery.
+
+- Consider file archiving with cloud tiering. Azure File Sync stores only recently accessed data on local servers. Implement cloud tiering so non-used data moves to Azure Files.
+
+### Azure File Sync agent
+The Azure File Sync agent is a downloadable package that enables Windows Server to be synced with an Azure Files share. The Azure File Sync agent has three main components:
+
+- FileSyncSvc.exe: This file is the background Windows service that's responsible for monitoring changes on server endpoints, and for initiating sync sessions to Azure.
+
+- StorageSync.sys: This file is the Azure File Sync file system filter that supports cloud tiering. The filter is responsible for tiering files to Azure Files when cloud tiering is enabled.
+
+- PowerShell cmdlets: These PowerShell management cmdlets allow you to interact with the Microsoft.StorageSync Azure resource provider. You can find the cmdlets at the following (default) locations:
+
+  - `C:\\Program Files\\Azure\\StorageSyncAgent\\StorageSync.Management.PowerShell.Cmdlets.dll`
+  - `C:\\Program Files\\Azure\\StorageSyncAgent\\StorageSync.Management.ServerCmdlets.dll`
+	
+Server endpoint
+A server endpoint represents a specific location on a registered server, such as a folder on a server volume. Multiple server endpoints can exist on the same volume if their namespaces are unique (for example, F:\\sync1 and F:\\sync2).
+
+Cloud endpoint
+ - A cloud endpoint is an Azure Files share that's part of a sync group. As part of a sync group, the entire cloud endpoint (Azure Files share) syncs.
+
+ - An Azure Files share can be a member of one cloud endpoint only.
+
+ - An Azure Files share can be a member of one sync group only.
+
+Consider the scenario where you have a share with existing files. If you add the share as a cloud endpoint to a sync group, the files in the share are merged with files on other endpoints in the sync group.

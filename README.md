@@ -1259,3 +1259,54 @@ Azure Storage supports three types of shared access signatures:
 You can create a SAS ad-hoc by specifying all the options you need to control, including start time, expiration time, and permissions.
 
 If you plan to create a service SAS, there's also an option to associate it with a stored access policy. A stored access policy can be associated with up to five active SASs. You can control access and expiration at the stored access policy level. This is a good approach if you need to have granular control to change the expiration, or to revoke a SAS. The only way to revoke or change an ad-hoc SAS is to change the storage account keys.
+
+### Create a SAS in .NET
+Because your company provides access to third parties, you can't use Azure AD to create service principals for each third party that requires access to medical images. Your app uses a storage account key for each individual file. The following steps show how to accomplish these steps in code.
+	
+Create a blob container to connect to the storage account on Azure
+
+```C#
+BlobContainerClient container = new BlobContainerClient( "ConnectionString", "Container" );
+```	
+
+Retrieve the blob you want to create a SAS token for and create a BlobClient
+
+```C#
+foreach (BlobItem blobItem in container.GetBlobs())
+{
+    BlobClient blob = container.GetBlobClient(blobItem.Name);
+}
+```	
+	
+Create a BlobSasBuilder object for the blob you use to generate the SAS token
+	
+```C#
+BlobSasBuilder sas = new BlobSasBuilder
+{
+    BlobContainerName = blob.BlobContainerName,
+    BlobName = blob.Name,
+    Resource = "b",
+    ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(1)
+};
+
+// Allow read access
+sas.SetPermissions(BlobSasPermissions.Read);
+```
+	
+Authenticate a call to the ToSasQueryParameters method of the BlobSasBuilder object
+```C#
+StorageSharedKeyCredential storageSharedKeyCredential = new StorageSharedKeyCredential( "AccountName", "AccountKey");
+
+sasToken = sas.ToSasQueryParameters(storageSharedKeyCredential).ToString();
+```
+
+Best practices
+To reduce the potential risks of using a SAS, Microsoft provides some guidance:
+
+- To securely distribute a SAS and help prevent man-in-the-middle attacks, always use HTTPS.
+- The most secure SAS is user delegation. Use it wherever possible because it removes the need to store your storage account key in code. Azure AD must be used to manage credentials; this option might not be possible for your solution.
+- Try to set your expiration time to the smallest useful value. If a SAS key becomes compromised, it can be exploited for only a short time.
+- Apply the rule of minimum-required privileges. Only grant the access that's required. For example, in your app, read-only access is sufficient.
+- There are some situations where a SAS isn't the correct solution. When there's an unacceptable risk of using a SAS, create a middle-tier service to manage users and their access to storage.
+	
+The most flexible and secure way to use a service or account SAS is to associate the SAS tokens with a stored access policy. You'll explore these benefits and how they work in a later unit.

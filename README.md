@@ -1127,3 +1127,135 @@ Cloud endpoint
  - An Azure Files share can be a member of one sync group only.
 
 Consider the scenario where you have a share with existing files. If you add the share as a cloud endpoint to a sync group, the files in the share are merged with files on other endpoints in the sync group.
+
+# Deploy Azure File Sync
+	
+|Deploy Storage Sync Service| Prepare Windows Server(s)| Install Azure File Synce Agent| Register Windows Servers|
+|---------------------------|--------------------------|-------------------------------|-------------------------|
+	
+### Step 1: Deploy the Storage Sync Service
+You can deploy the Storage Sync Service from the Azure portal. You configure the following settings:
+
+- The deployment name for the Storage Sync Service
+- The Azure subscription ID to use for the deployment
+- A Resource Group for the deployment
+- The deployment location 
+
+### Step 2: Prepare each Windows Server to use Azure File Sync
+After you deploy the Storage Sync Service, you configure each Windows Server or cloud virtual machine that you intend to use with Azure File Sync, including server nodes in a Failover Cluster.
+
+### Step 3: Install the Azure File Sync agent
+When the Windows Server configuration is complete, you're ready to install the Azure File Sync agent. The agent is a downloadable package that enables Windows Server to be synced with an Azure Files share. The Azure File Sync agent installation package should install relatively quickly.
+
+   >**Note**: For the agent installation, Microsoft recommends using the default installation path. Also enable Microsoft Update to ensure your severs are running the latest version of Azure File Sync.
+
+### Step 4: Register each Windows Server with the Storage Sync Service
+After the Azure File Sync agent installation completes, the Server Registration window opens.
+
+By registering the Windows Server with a Storage Sync Service, you establish a trust relationship between your server (or cluster) and the Storage Sync Service. For the registration, you need your Azure subscription ID and some of the deployment settings you configured in the first step:
+
+- The Storage Sync Service deployment name
+- The Resource Group for the deployment
+	
+   >**Note**: A server (or cluster) can be registered with only one Storage Sync Service resource at a time.
+
+# Use the AzCopy tool
+
+An alternate method for transferring data is the AzCopy tool. AzCopy v10 is the next-generation command-line utility for copying data to and from Azure Blob Storage and Azure Files. AzCopy v10 offers a redesigned command-line interface (CLI) and new architecture for high-performance reliable data transfers. You can use AzCopy to copy data between a file system and a storage account, or between storage accounts.
+
+### Things to know about AzCopy
+Let's look at some of the characteristics of the AzCopy tool.
+
+Every AzCopy instance creates a job order and a related log file. You can view and restart previous jobs, and resume failed jobs.
+
+You can use AzCopy to list or remove files or blobs in a given path. AzCopy supports wildcard patterns in a path, `--include` flags, and `--exclude` flags.
+
+AzCopy automatically retries a transfer when a failure occurs.
+
+When you use Azure Blob Storage, AzCopy lets you copy an entire account to another account with the `Put` command from URL APIs. No data transfer to the client is needed.
+
+AzCopy supports Azure Data Lake Storage Gen2 APIs.
+
+AzCopy is built into Azure Storage Explorer.
+
+AzCopy is available on Windows, Linux, and macOS.
+
+Authentication options
+There are two options to authenticate your transferred data when using AzCopy.
+
+|Authentication| Support| Description|
+|--------------|---------------|-----------------------------------|
+|Azure Active Directory (Azure AD)| Azure Blob Storage and Azure Data Lake Storage Gen2| The user enters the `.\\azcopy` sign-in command to sign in by using Azure AD. The user should have the Storage Blob Data Contributor role assigned, which allows them to write to Blob Storage by using Azure AD authentication. When the user signs in from Azure AD, they provide their credentials only once. This option allows the user to circumvent having to append a SAS token to each command. 
+|SAS tokens| Azure Blob Storage and Azure Files| On the command line, the user appends a SAS token to the blob or file path for every command they enter.|
+	
+### AzCopy and Azure Storage Explorer
+Azure Storage Explorer uses the AzCopy tool for all of its data transfers. If you want to use a graphical UI to work with your files, you can use Azure Storage Explorer and gain the performance advantages of AzCopy.
+
+Azure Storage Explorer uses your account key to perform operations. After you sign into Azure Storage Explorer, you don't need to provide your authorization credentials again.
+
+### Things to consider when using AzCopy
+Review the following scenarios for using AzCopy. Consider how the tool features can enhance your Azure Storage solution.
+
+- Consider data synchronization. Use AzCopy to synchronize a file system to Azure Blob Storage and vice versa. AzCopy is ideal for incremental copy scenarios.
+
+- Consider job management. Manage your transfer operations with AzCopy. View and restart previous jobs. Resume failed jobs.
+
+- Consider transfer resiliency. Provide data resiliency for your data transfers. If a copy job fails, AzCopy automatically retries the copy.
+
+- Consider fast account to account copy. Use AzCopy with Azure Blob Storage for the account to account copy feature. Because data isn't transferred to the client, the transfer is faster.
+	
+The basic CLI syntax for AzCopy starts with the `azcopy` command followed by the type of job to perform, such as `copy`. For the `copy` command, you specify the `[source]` path of the files to copy, the `[destination]` path for the copied files, and any `[flags]` for options to apply to the transfer job.
+	
+```
+azcopy copy [source] [destination] [flags]
+```
+Here's how you can get a list of available CLI commands for AzCopy:
+	
+```
+azcopy --help
+```
+# Authorization options for Azure Storage
+
+Before you enhance your company's patient diagnostic image web app, you'd like to understand all the options for secure access. A shared access signature (SAS) provides a secure way of granting access to resources for clients. But it's not the only way to grant access. In some situations, other options might offer better choices for your organization.
+
+Your company could make use of more than just the SAS method of authentication.
+
+### Access Azure Storage
+Files stored in Azure Storage are accessed by clients over HTTP/HTTPS. Azure checks each client request for authorization to access stored data. Four options are available for blob storage:
+
+- Public access
+- Azure Active Directory (Azure AD)
+- Shared key
+- Shared access signature (SAS)
+#### Public access
+Public access is also known as anonymous public read access for containers and blobs.
+
+There are two separate settings that affect public access:
+
+- The Storage Account. Configure the storage account to allow public access by setting the AllowBlobPublicAccess property. When set to true, Blob data is available for public access only if the container's public access setting is also set.
+
+- The Container. You can enable anonymous access only if anonymous access has been allowed for the storage account. A container has two possible settings for public access: Public read access for blobs, or public read access for a container and its blobs. Anonymous access is controlled at the container level, not for individual blobs. This means that if you want to secure some of the files, you need to put them in a separate container that doesn't permit public read access.
+
+Both storage account and container settings are required to enable anonymous public access. The advantages of this approach are that you don't need to share keys with clients who need access to your files. You also don't need to manage a SAS.
+
+#### Azure Active Directory
+Use the Azure AD option to securely access Azure Storage without storing any credentials in your code. AD authorization takes a two-step approach. First, you authenticate a security principal that returns an OAuth 2.0 token if successful. This token is then passed to Azure Storage to enable authorization to the requested resource.
+
+Use this form of authentication if you're running an app with managed identities or using security principals.
+
+#### Shared key
+Azure Storage creates two 512-bit access keys for every storage account that's created. You share these keys to grant clients access to the storage account. These keys grant anyone with access the equivalent of root access to your storage.
+
+We recommend that you manage storage keys with Azure Key Vault because it's easy to rotate keys on a regular schedule to keep your storage account secure.
+
+#### Shared access signature
+A SAS lets you grant granular access to files in Azure Storage, such as read-only or read-write access, expiration time, after which the SAS no longer enables the client to access the chosen resources. A shared access signature is a key that grants permission to a storage resource, and should be protected in the same manner as an account key.
+
+Azure Storage supports three types of shared access signatures:
+
+- User delegation SAS: Can only be used for Blob storage and is secured with Azure AD credentials.
+- Service SAS: A service SAS is secured using a storage account key. A service SAS delegates access to a resource in any one of four Azure Storage services: Blob, Queue, Table, or File.
+- Account SAS: An account SAS is secured with a storage account key. An account SAS has the same controls as a service SAS, but can also control access to service-level operations, such as Get Service Stats.
+You can create a SAS ad-hoc by specifying all the options you need to control, including start time, expiration time, and permissions.
+
+If you plan to create a service SAS, there's also an option to associate it with a stored access policy. A stored access policy can be associated with up to five active SASs. You can control access and expiration at the stored access policy level. This is a good approach if you need to have granular control to change the expiration, or to revoke a SAS. The only way to revoke or change an ad-hoc SAS is to change the storage account keys.

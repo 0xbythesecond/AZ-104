@@ -1466,3 +1466,130 @@ Azure services that support availability zones are divided into two categories.
 |---------------|----------------------------------------------------------|-----------------------------------------------------------------------------|
 |Zonal services| Azure zonal services pin each resource to a specific zone.|<ul><li>Azure Virtual Machines</li><li>Azure managed disks</li><li>Standard IP addresses</li>|
 |Zone-redundant services| For Azure services that are zone-redundant, the platform replicates automatically across all zones.|<ul><li>Azure Storage that's zone-redundant</li><li>Azure SQL Database</li>|
+	
+# Compare vertical and horizontal scaling
+
+A robust virtual machine configuration includes support for scalability. Scalability allows throughput for a virtual machine in proportion to the availability of the associated hardware resources. A scalable virtual machine can handle increases in requests without adversely affecting response time and throughput. For most scaling operations, there are two implementation options: vertical and horizontal.
+
+### Things to know about vertical scaling
+Vertical scaling, also known as scale up and scale down, involves increasing or decreasing the virtual machine size in response to a workload. Vertical scaling makes a virtual machine more (scale up) or less (scale down) powerful.
+	
+Here are some scenarios where using vertical scaling can be advantageous:
+
+If you have a service built on a virtual machine that's under-utilized such as on the weekend, you can use vertical scaling to decrease the virtual machine size and reduce your monthly costs.
+
+You can implement vertical scaling to increase your virtual machine size to support larger demand without having to create extra virtual machines.
+
+### Things to know about horizontal scaling
+Horizontal scaling, also referred to as scale out and scale in, is used to adjust the number of virtual machines in your configuration to support the changing workload. When you implement horizontal scaling, there's an increase (scale out) or decrease (scale in) in the number of virtual machine instances.
+	
+# Configure autoscale
+
+Scaling policy: Manual scale maintains a fixed instance count. Custom autoscale scales the capacity on any schedule, based on any metrics.
+
+- Minimum number of VMs: Specify the minimum number of virtual machines that should be available when autoscaling is applied on your Virtual Machine Scale Sets implementation.
+
+- Maximum number of VMs: Specify the maximum number of virtual machines that can be available when autoscaling is applied on your implementation.
+
+### Scale out
+
+- CPU threshold: Specify the CPU usage percentage threshold to trigger the scale-out autoscale rule.
+
+- Duration in minutes: Duration in minutes is the amount of time that Autoscale engine will look back for metrics. For example, 10 minutes means that every time autoscale runs, it will query metrics for the past 10 minutes. This delay allows your metrics to stabilize and avoids reacting to transient spikes.
+
+- Number of VMs to increase by: Specify the number of virtual machines to add to your Virtual Machine Scale Sets implementation when the scale-out autoscale rule is triggered.
+
+### Scale in
+
+- Scale in CPU threshold: Specify the CPU usage percentage threshold to trigger the scale-in autoscale rule.
+
+- Number of VMs to decrease by: Specify the number of virtual machines to remove from your implementation when the scale-in autoscale rule is triggered.
+
+Scale in policy: The [scale-in policy](https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-scale-in-policy) feature provides users a way to configure the order in which virtual machines are scaled-in.
+	
+# Implement Azure App Service plans
+
+In Azure App Service, an application runs in an Azure App Service plan. An App Service plan defines a set of compute resources for a web application to run. The compute resources are analogous to a server farm in conventional web hosting. One or more applications can be configured to run on the same computing resources (or in the same App Service plan).
+
+### Things to know about App Service plans
+	
+Let's take a closer look at how to implement and use an App Service plan with your virtual machines.
+
+- When you create an App Service plan in a region, a set of compute resources is created for the plan in the specified region. Any applications that you place into the plan run on the compute resources defined by the plan.
+
+- Each App Service plan defines three settings:
+
+  - Region: The region for the App Service plan, such as West US, Central India, North Europe, and so on.
+  - Number of VM instances: The number of virtual machine instances to allocate for the plan.
+  - Size of VM instances: The size of the virtual machine instances in the plan, including Small, Medium, or Large.
+	
+- You can continue to add new applications to an existing plan as long as the plan has enough resources to handle the increasing load.
+
+### How applications run and scale in App Service plans
+	
+The Azure App Service plan is the scale unit of App Service applications. Depending on the pricing tier for your Azure App Service plan, your applications run and scale in a different manner. If your plan is configured to run five virtual machine instances, then all applications in the plan run on all five instances. If your plan is configured for autoscaling, then all applications in the plan are scaled out together based on the autoscale settings.
+
+Here's a summary of how applications run and scale in Azure App Service plan pricing tiers:
+
+- Free or Shared tier:
+
+  - Applications run by receiving CPU minutes on a shared virtual machine instance.
+  - Applications can't scale out.
+- Basic, Standard, Premium, or Isolated tier:
+
+  - Applications run on all virtual machine instances configured in the App Service plan.
+  - Multiple applications in the same plan share the same virtual machine instances.
+  - If you have multiple deployment slots for an application, all deployment slots run on the same virtual machine instances.
+  - If you enable diagnostic logs, perform backups, or run WebJobs, these tasks use CPU cycles and memory on the same virtual machine instances.
+	
+### Things to consider when using App Service plans
+Review the following considerations about using Azure App Service plans to run and scale your applications. Think about what conditions might apply to running and scaling the hotel website.
+
+- Consider cost savings. Because you pay for the computing resources that your App Service plan allocates, you can potentially save money by placing multiple applications into the same App Service plan.
+
+- Consider multiple applications in one plan. Create a single plan to support multiple applications, to make it easier to configure and maintain shared virtual machine instances. Because the applications share the same virtual machine instances, you need to carefully manage your plan resources and capacity.
+
+- Consider plan capacity. Before you add a new application to an existing plan, determine the resource requirements for the new application and identify the remaining capacity of your plan.
+
+   >**Note**: Overloading an App Service plan can potentially cause downtime for new and existing applications.
+
+- Consider application isolation. Isolate your application into a new App Service plan when:
+  - The application is resource-intensive.
+  - You want to scale the application independently from the other applications in the existing plan.
+  - The application needs resource in a different geographical region.
+
+### Things to know about autoscale
+Let's take a closer look at how to use autoscale for your Azure App Service plan and applications.
+
+- To use autoscale, you specify the minimum, and maximum number of instances to run by using a set of rules and conditions.
+
+- When your application runs under autoscale conditions, the number of virtual machine instances are automatically adjusted based on your rules. When rule conditions are met, one or more autoscale actions are triggered.
+
+- An autoscale setting is read by the autoscale engine to determine whether to scale out or in. Autoscale settings are grouped into profiles.
+
+- Autoscale rules include a trigger and a scale action (in or out). The trigger can be metric-based or time-based.
+	
+  - Metric-based rules measure application load and add or remove virtual machines based on the load, such as "do this action when CPU usage is above 50%." Example metrics include CPU time, Average response time, and Requests.
+
+  - Time-based rules (or, schedule-based) allow you to scale when you see time patterns in your load and want to scale before a possible load increase or decrease occurs. An example is "trigger a webhook every 8:00 AM on Saturday in a given time zone."
+
+- The autoscale engine uses notification settings.
+
+A notification setting defines what notifications should occur when an autoscale event occurs based on satisfying the criteria of an autoscale setting profile. Autoscale can notify one or more email addresses or make calls to one or more webhooks.
+
+### Things to consider when configuring autoscale
+There are several considerations to keep in mind when you configure autoscale for your Azure App Service plan and applications.
+
+- Minimum instance count. Set a minimum instance count to make sure your application is always running even when there's no load.
+
+- Maximum instance count. Set a maximum instance count to limit your total possible hourly cost.
+
+- Adequate scale margin. Make sure your maximum and minimum instance count values are different, and set an adequate margin between the two values. You can automatically scale between the minimum and maximum by using rules you create.
+
+- Scale rule combinations. Always use a scale-out and scale-in rule combination that performs an increase and decrease. If you don't set a scale-out rule, your application might fail, or performance might degrade under increased loads. If you don't set a scale-in rule, you can experience unnecessary and extensive costs when the load decreases.
+
+- Metric statistics. Carefully choose the appropriate statistic for your diagnostic metrics, including Average, Minimum, Maximum, and Total.
+
+Default instance count. Always select a safe default instance count. The default instance count is important because autoscale scales your service to the count you specify when metrics aren't available.
+
+- Notifications. Always configure autoscale notifications. It's important to maintain awareness of how your application is performing as the load changes.

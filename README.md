@@ -175,17 +175,20 @@ Commands in the CLI are structured in groups and subgroups. Each group represent
 So, how do you find the particular commands you need? One way is to use az find, the AI robot that uses the Azure documentation to tell you more about commands, the CLI, and more.
 
 Example: find the most popular commands related to the word blob.
-```
+	
+```bash
 az find blob
 ```       
+	
 If you already know the name of the command you want, the --help argument for that command will get you more detailed information on the command, and a list of the available subcommands for a command group. So, with our storage example, here's how you can get a list of the subgroups and commands for managing blob storage:
-```
+	
+```bash
 az storage blob --help
 ```       
 ### Connect
 Since you're working with a local install of the Azure CLI, you'll need to authenticate before you can execute Azure commands by using the Azure CLI login command.
 
-``` 
+```bash
  az login
 ```
 
@@ -196,20 +199,23 @@ You'll often need to create a new resource group before you create a new Azure s
 
 The Azure CLI group create command creates a resource group. You must specify a name and location. The name must be unique within your subscription. The location determines where the metadata for your resource group will be stored. You use strings like "West US", "North Europe", or "West India" to specify the location; alternatively, you can use single-word equivalents, such as westus, northeurope, or westindia. The core syntax is:
 
-```
+```bash
 az group create --name <name> --location <location>
-```       
+```    
+	
 ### Verify
 For many Azure resources, the Azure CLI provides a list subcommand to view resource details. For example, the Azure CLI group list command lists your Azure resource groups. This is useful to verify whether the resource group was successfully created:
 
-```
+```bash
 az group list
 ```       
+	
 To get a more concise view, you can format the output as a simple table:
 
-```
+```bash
 az group list --output table       
-```       
+```  
+	
 <hr>
 
  **Single sign-on (SSO) access**
@@ -1206,14 +1212,16 @@ Review the following scenarios for using AzCopy. Consider how the tool features 
 	
 The basic CLI syntax for AzCopy starts with the `azcopy` command followed by the type of job to perform, such as `copy`. For the `copy` command, you specify the `[source]` path of the files to copy, the `[destination]` path for the copied files, and any `[flags]` for options to apply to the transfer job.
 	
-```
+```bash
 azcopy copy [source] [destination] [flags]
 ```
+	
 Here's how you can get a list of available CLI commands for AzCopy:
 	
-```
+```bash
 azcopy --help
 ```
+	
 # Authorization options for Azure Storage
 
 Before you enhance your company's patient diagnostic image web app, you'd like to understand all the options for secure access. A shared access signature (SAS) provides a secure way of granting access to resources for clients. But it's not the only way to grant access. In some situations, other options might offer better choices for your organization.
@@ -1310,3 +1318,151 @@ To reduce the potential risks of using a SAS, Microsoft provides some guidance:
 - There are some situations where a SAS isn't the correct solution. When there's an unacceptable risk of using a SAS, create a middle-tier service to manage users and their access to storage.
 	
 The most flexible and secure way to use a service or account SAS is to associate the SAS tokens with a stored access policy. You'll explore these benefits and how they work in a later unit.
+
+The stored access policy you create for a blob container can be used for all the blobs in the container and for the container itself. A stored access policy is created with the following properties:
+
+- Identifier: The name you use to reference the stored access policy.
+- Start time: A DateTimeOffset value for the date and time when the policy might start to be used. This value can be null.
+- Expiry time: A DateTimeOffset value for the date and time when the policy expires. After this time, requests to the storage will fail with a 403 error-code message.
+- Permissions: The list of permissions as a string that can be one or all of acdlrw.	
+
+```bash
+az storage container policy create \
+    --name <stored access policy identifier> \
+    --container-name <container name> \
+    --start <start time UTC datetime> \
+    --expiry <expiry time UTC datetime> \
+    --permissions <(a)dd, (c)reate, (d)elete, (l)ist, (r)ead, or (w)rite> \
+    --account-key <storage account key> \
+    --account-name <storage account name> \
+```
+# Plan virtual machines
+
+Before you create an Azure virtual machine, it's helpful to make a plan for the machine configuration. You need to consider your preferences for several options, including the machine size and location, storage usage, and associated costs.
+
+Things to know about configuring virtual machines
+Let's walk through a checklist of things you need to consider when configuring a virtual machine.
+
+- Start with the network.
+- Choose a name for the virtual machine.
+- Decide the location for the virtual machine.
+- Determine the size of the virtual machine.
+- Review the pricing model and estimate your costs.
+- Identify which Azure Storage to use with the virtual machine.
+- Select an operating system for the virtual machine.
+
+### Network configuration
+Virtual networks are used in Azure to provide private connectivity between Azure Virtual Machines and other Azure services. Virtual machines and services that are part of the same virtual network can access one another. By default, services outside the virtual network can't connect to services within the virtual network. You can, however, configure the network to allow access to the external service, including your on-premises servers.
+
+Network addresses and subnets aren't trivial to change after they're configured. If you plan to connect your private company network to the Azure services, make sure you consider the topology before you put any virtual machines into place.
+
+### Virtual machine name
+The virtual machine name is used as the computer name, which is configured as part of the operating system. You can specify a name with up to 15 characters on a Windows virtual machine and 64 characters on a Linux virtual machine.
+
+The virtual machine name also defines a manageable Azure resource, and it's not trivial to change later. You should choose names that are meaningful and consistent, so you can easily identify what the virtual machine does. A good convention uses several of the following elements in the machine name:
+
+|Name element| Examples| Description|
+|------------|---------|------------|	
+|Environment or purpose| `dev` (development), `prod` (production), `QA` (testing)| A portion of the name should identify the environment or purpose for the machine.
+|Location| `uw` (US West), `je` (Japan East), `ne` (North Europe)| Another portion of the name should specify the region where the machine is deployed.
+|Instance| `1, 02, 005`| For multiple machines that have similar names, include an instance number in the name to differentiate the machines in the same category.
+|Product or service| `Outlook, SQL, AzureAD`| A portion of the name can specify the product, application, or service that the machine supports.
+|Role| `security, web, messaging`| A portion of the name can specify what role the machine supports within the organization.|
+	
+Let's consider how to name the first development web server for your company that's hosted in the US South Central location. In this scenario, you might use the machine name devusc-webvm01. dev stands for development and usc identifies the location. web indicates the machine as a web server, and the suffix 01 shows the machine is the first in the configuration.
+
+### Virtual machine location
+Azure has datacenters all over the world filled with servers and disks. These datacenters are grouped into geographic regions like West US, North Europe, Southeast Asia, and so on. The datacenters provide redundancy and availability.
+
+Each virtual machine is in a region where you want the resources like CPU and storage to be allocated. The regional location lets you place your virtual machines as close as possible to your users. The location of the machine can improve performance and ensure you meet any legal, compliance, or tax requirements.
+
+There are two other points to consider about the virtual machine location.
+
+- The machine location can limit your available options. Each region has different hardware available, and some configurations aren't available in all regions.
+
+- There are price differences between locations. To find the most cost-effective choice, check for your required configuration in different regions.
+
+### Virtual machine size
+Azure offers different memory and storage options for different [virtual machine sizes](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes). The best way to determine the appropriate machine size is to consider the type of workload your machine needs to run. Based on the workload, you can choose from a subset of available virtual machine sizes.
+
+### Azure Storage
+[Azure Managed Disks](https://learn.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview) handle Azure storage account creation and management in the background for you. You specify the disk size and the performance tier (Standard or Premium). Azure creates and manages the disk. As you add disks or scale the virtual machine up and down, you don't have to worry about the storage being used.
+
+### Virtual machine pricing options
+A subscription is billed two separate costs for every virtual machine: compute and storage. By separating these costs, you can scale them independently and only pay for what you need.
+
+- Compute expenses are priced on a per-hour basis but billed on a per-minute basis. If the virtual machine is deployed for 55 minutes, you're charged for only 55 minutes of usage. You're not charged for compute capacity if you stop and deallocate the virtual machine. The [hourly price](https://azure.microsoft.com/pricing/details/virtual-machines/linux/) varies based on the virtual machine size and operating system you select. For the compute costs, you're able to choose from two payment options:
+
+  - Consumption-based: With the consumption-based option, you pay for compute capacity by the second. You're able to increase or decrease compute capacity on demand and start or stop at any time. Use consumption-based pricing if you run applications with short-term or unpredictable workloads that can't be interrupted. An example scenario is if you're doing a quick test or developing an app in a virtual machine.
+
+  - Reserved Virtual Machine Instances: The Reserved Virtual Machine Instances (RI) option is an advance purchase of a virtual machine for one or three years in a specified region. The commitment is made up front, and in return, you get up to 72% price savings compared to pay-as-you-go pricing. RIs are flexible and can easily be exchanged or returned for an early termination fee. Use this option if the virtual machine has to run continuously, or you need budget predictability, and you can commit to using the virtual machine for at least a year.
+
+- Storage costs are charged separately for the Azure Storage used by the virtual machine. The status of the virtual machine has no relation to the Azure Storage charges that are incurred. You're always charged for any Azure Storage used by the disks.
+
+### Operating system
+Azure provides various operating system images that you can install into the virtual machine, including several versions of Windows and flavors of Linux. Azure bundles the cost of the operating system license into the price.
+
+- If you're looking for more than just base operating system images, you can search [Azure Marketplace](https://azuremarketplace.microsoft.com/marketplace/apps/category/compute). There are various install images that include not only the operating system but popular software tools, such as WordPress. The image stack consists of a Linux server, Apache web server, a MySQL database, and PHP. Instead of setting up and configuring each component, you can install an Azure Marketplace image and get the entire stack all at once.
+
+- If you don't find a suitable operating system image, you can create your own disk image. Your disk image can be uploaded to Azure Storage and used to create an Azure virtual machine. Keep in mind that Azure only supports 64-bit operating systems.
+
+|Classification|Description|Scenarios|
+|--------------|--------------------------------------------------------------------------------------|------------------------------------------------------------|	
+|General purpose|General-purpose virtual machines are designed to have a balanced CPU-to-memory ratio.|<ul><li>Testing and development</li><li>Small to medium databases</li><li>Low to medium traffic web server</li>|
+|Compute optimized|Compute optimized virtual machines are designed to have a high CPU-to-memory ratio.|<ul><li>Medium traffic web servers</li><li>Network appliances</li><li> Batch processes</li><li> Application servers</li>|
+|Memory optimized| Memory optimized virtual machines are designed to have a high memory-to-CPU ratio.| <ul><li>Relational database servers</li><li>Medium to large caches</li><li>In-memory analytics</li>|
+|Storage optimized| Storage optimized virtual machines are designed to have high disk throughput and I/O.|<ul><li>Big Data</li><li>SQL and NoSQL databases</li><li>Data warehousing</li><li>Large transactional databases</li>|
+|GPU| GPU virtual machines are specialized virtual machines targeted for heavy graphics rendering and video editing. Available with single or multiple GPUs.| <ul><li>Model training</li><li>Inferencing with deep learning</li>|
+|High performance computers| High performance compute offers the fastest and most powerful CPU virtual machines with optional high-throughput network interfaces (RDMA).|<ul><li>Workloads that require fast performance</li><li>High traffic networks</li>|
+	
+### Resizing virtual machines
+Azure allows you to change the virtual machine size when the existing size no longer meets your needs. You can resize a virtual machine if your current hardware configuration is allowed in the new size. This option provides a fully agile and elastic approach to virtual machine management.
+
+When you stop and deallocate the virtual machine, you can select any size available in your region.
+
+   >**Note**: Be cautious when resizing production virtual machines. Resizing a machine might require a restart that can cause a temporary outage or change configuration settings such as the IP address.
+	
+### Configure virtual machine image
+The Azure portal guides you through the configuration process to create your virtual machine image. The process includes configuring basic and advanced options, and specifying details about the disks, virtual networks, and machine management.
+
+
+- The Basics tab contains the project details, administrator account, and inbound port rules.
+
+- On the Disks tab, you select the OS disk type and specify your data disks.
+
+- The Networking tab provides settings to create virtual networks and load balancing.
+
+- On the Management tab, you can enable auto-shutdown and specify backup details.
+
+- On the Advanced tab, you can configure agents, scripts, or virtual machine extensions.
+
+- Other settings are available on the Monitoring and Tags tabs.
+
+### Things to know about maintenance planning
+An availability plan for Azure virtual machines needs to include strategies for unplanned hardware maintenance, unexpected downtime, and planned maintenance. As you review the following scenarios, think about how these scenarios can impact the example company website.
+
+- An unplanned hardware maintenance event occurs when the Azure platform predicts that the hardware or any platform component associated to a physical machine is about to fail. When the platform predicts a failure, it issues an unplanned hardware maintenance event. Azure uses Live Migration technology to migrate your virtual machines from the failing hardware to a healthy physical machine. Live Migration is a virtual machine preserving operation that only pauses the virtual machine for a short time, but performance might be reduced before or after the event.
+
+- Unexpected downtime occurs when the hardware or the physical infrastructure for your virtual machine fails unexpectedly. Unexpected downtime can include local network failures, local disk failures, or other rack level failures. When detected, the Azure platform automatically migrates (heals) your virtual machine to a healthy physical machine in the same datacenter. During the healing procedure, virtual machines experience downtime (reboot) and in some cases loss of the temporary drive.
+
+- Planned maintenance events are periodic updates made by Microsoft to the underlying Azure platform to improve overall reliability, performance, and security of the platform infrastructure that your virtual machines run on. Most of these updates are performed without any impact to your virtual machines or Cloud Services.
+
+   >**Note**: Microsoft doesn't automatically update your virtual machine operating system or other software. You have complete control and responsibility for those updates. However, the underlying software host and hardware are periodically patched to ensure reliability and high performance.
+	
+Availability zones are unique physical locations within an Azure region.
+
+Each zone is made up of one or more datacenters that are equipped with independent power, cooling, and networking.
+
+To ensure resiliency, there's a minimum of three separate zones in all enabled regions.
+
+The physical separation of availability zones within a region protects applications and data from datacenter failures.
+
+Zone-redundant services replicate your applications and data across availability zones to protect against single-points-of-failure.
+
+Things to consider when using availability zones
+Azure services that support availability zones are divided into two categories.
+
+|Category| Description|	Examples|
+|---------------|----------------------------------------------------------|-----------------------------------------------------------------------------|
+|Zonal services| Azure zonal services pin each resource to a specific zone.|<ul><li>Azure Virtual Machines</li><li>Azure managed disks</li><li>Standard IP addresses</li>|
+|Zone-redundant services| For Azure services that are zone-redundant, the platform replicates automatically across all zones.|<ul><li>Azure Storage that's zone-redundant</li><li>Azure SQL Database</li>|

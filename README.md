@@ -1635,9 +1635,67 @@ The following table lists the settings that are swapped between deployment slots
 
 |Swapped settings| Slot-specific settings|
 |-----------------------------------------------------------------------------------|-----------------------------------------------------------|	
-|<ul><li>General settings, such as framework version,</li><li>32/64-bit, web sockets</li><li>App settings *</li><li>Connection strings *</li><li>Handler mappings</li><li>Public certificates</li><li>WebJobs content</li><li>Hybrid connections **</li><li>Service endpoints **</li><li>Azure Content Delivery Network **</li><li>Path mapping</li>|<ul><li>Custom domain names</li><li>Non-public certificates and TLS/SSL settings</li><li>Scale settings</li><li>Always On</li><li>IP restrictions</li><li>WebJobs schedulers</li><li>Diagnostic settings</li><li>Cross-origin resource sharing (CORS)</li><li>Virtual network integration</li><li>Managed identities</li><li>Settings that end with the suffix _EXTENSION_VERSION</li>|
+|<ul><li>General settings, such as framework version, 32/64-bit, web sockets</li><li>App settings *</li><li>Connection strings *</li><li>Handler mappings</li><li>Public certificates</li><li>WebJobs content</li><li>Hybrid connections **</li><li>Service endpoints **</li><li>Azure Content Delivery Network **</li><li>Path mapping</li>|<ul><li>Custom domain names</li><li>Non-public certificates and TLS/SSL settings</li><li>Scale settings</li><li>Always On</li><li>IP restrictions</li><li>WebJobs schedulers</li><li>Diagnostic settings</li><li>Cross-origin resource sharing (CORS)</li><li>Virtual network integration</li><li>Managed identities</li><li>Settings that end with the suffix _EXTENSION_VERSION</li>|
 
 	
 * Setting can be configured to be slot-specific.
 
 ** Feature isn't currently available.
+
+# Create custom domain names
+
+When you create a web app, Azure assigns the app to a subdomain of azurewebsites.net. Suppose your web app is named contoso. Azure creates a URL for your web app as contoso.azurewebsites.net. Azure also assigns a virtual IP address for your app. For a production web app, you might want users to see a custom domain name.
+	
+Configure a custom domain name for your app
+There are three steps to create a custom domain name. The following steps outline how to create a domain name in the Azure portal.
+
+   >**Note**: To map a custom DNS name to your app, you need a paid tier of an App Service plan for your app.
+
+1. Reserve your domain name. If you haven't registered for an external domain name for your app, the easiest way to set up a custom domain is to buy one directly in the Azure portal. (This name isn't the Azure assigned name of \*.azurewebsites.net.) The registration process enables you to manage your web app's domain name directly in the Azure portal instead of going to a third-party site. Configuring the domain name in your web app is also a simple process in the Azure portal.
+
+2. Create DNS records to map the domain to your Azure web app. The Domain Name System (DNS) uses data records to map domain names to IP addresses. There are several types of DNS records.
+
+- For web apps, you create either an A (Address) record or a CNAME (Canonical Name) record.
+
+  - An A record maps a domain name to an IP address.
+  - A CNAME record maps a domain name to another domain name. DNS uses the second name to look up the address. Users still see the first domain name in their browser. As an example, you could map contoso.com to your webapp.azurewebsites.net URL.
+	
+- If the IP address changes, a CNAME entry is still valid, whereas an A record must be updated.
+
+- Some domain registrars don't allow CNAME records for the root domain or for wildcard domains. In such cases, you must use an A record.
+
+3. Enable the custom domain. After you have your domain and create your DNS record, use the Azure portal to validate your custom domain and add it to your web app. Be sure to test your domain before publishing.
+	
+# Back up and restore your App Service app
+
+### Things to know about Backup and Restore
+
+To use the Backup and Restore feature, you need the Standard or Premium tier App Service plan for your app or site.
+
+You need an Azure storage account and container in the same subscription as the app to back up.
+
+Azure App Service can back up the following information to the Azure storage account and container you configured for your app:
+
+App configuration settings
+File content
+Any database connected to your app (SQL Database, Azure Database for MySQL, Azure Database for PostgreSQL, MySQL in-app)
+	
+- Consider full backups. Do a full backup to easily save all configuration settings, all file content, and all database content connected with your app or site.
+
+When you restore a full backup, all content on the site is replaced with whatever is in the backup. If a file is on the site, but not in the backup, the file is deleted.
+
+- Consider partial backups. Specify a partial backup so you can choose exactly which files to back up.
+
+When you restore a partial backup, any content located in an excluded folder or file is left as-is.
+
+- Consider browsing back-up files. Unzip and browse the Zip and XML files associated with your backup to access your backups. This option lets you view the content without actually performing an app or site restore.
+
+- Consider firewall on back-up destination. If your storage account is enabled with a firewall, you can't use the storage account as the destination for your backups.
+	
+|Compare| Containers| Virtual machines|
+|-------|-----------|-----------------|	
+|Isolation| A container typically provides lightweight isolation from the host and other containers, but a container doesn't provide as strong a security boundary as a virtual machine.| A virtual machine provides complete isolation from the host operating system and other virtual machines. This separation is useful when a strong security boundary is critical, such as hosting apps from competing companies on the same server or cluster.
+|Operating system| Containers run the user mode portion of an operating system and can be tailored to contain just the needed services for your app. This approach helps you use fewer system resources.| Virtual machines run a complete operating system including the kernel, which requires more system resources (CPU, memory, and storage).
+|Deployment| You can deploy individual containers by using Docker via the command line. You can deploy multiple containers by using an orchestrator such as Azure Kubernetes Service.|	You can deploy individual virtual machines by using Windows Admin Center or Hyper-V Manager. You can deploy multiple virtual machines by using PowerShell or System Center Virtual Machine Manager.
+|Persistent storage| Containers use Azure Disks for local storage for a single node, or Azure Files (SMB shares) for storage shared by multiple nodes or servers.|	Virtual machines use a virtual hard disk (VHD) for local storage for a single machine, or an SMB file share for storage shared by multiple servers.
+|Fault tolerance| If a cluster node fails, any containers running on the node are rapidly recreated by the orchestrator on another cluster node.| Virtual machines can fail over to another server in a cluster, where the virtual machine's operating system restarts on the new server.|
